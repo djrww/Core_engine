@@ -13,8 +13,11 @@
 //! 機械檢查**如實報告**其不可回合臨界對與多正規形(這正是報告 §4.3 的
 //! 「同一錯誤、兩次修復、兩種結果」)。
 
-use crate::rep::{apply, enumerate_states, l8_check, AState, K, Menu, Policy, Rule};
+use crate::rep::{apply, enumerate_states, l8_check, AState, Menu, Policy, Rule, K};
 use std::collections::{BTreeSet, HashMap};
+
+/// 正規形/狀態閉包的規範化鍵:每事件 (id, storage, kind, start, end),排序去重。
+type StateKey = Vec<(u32, u32, K, u32, u32)>;
 
 #[derive(Clone, Debug)]
 pub struct NewmanReport {
@@ -29,8 +32,8 @@ pub struct NewmanReport {
     pub conclusion: &'static str,
 }
 
-fn canon_key(s: &AState) -> Vec<(u32, u32, K, u32, u32)> {
-    let mut v: Vec<(u32, u32, K, u32, u32)> = s
+fn canon_key(s: &AState) -> StateKey {
+    let mut v: StateKey = s
         .evs
         .iter()
         .map(|e| (e.id, e.storage, e.kind, e.it.start, e.it.end))
@@ -40,7 +43,7 @@ fn canon_key(s: &AState) -> Vec<(u32, u32, K, u32, u32)> {
 }
 
 /// 從 s 出發的 bf(深度 ≤ depth)狀態閉包。
-fn closure(s: &AState, menu: Menu, policy: Policy, depth: usize) -> HashMap<Vec<(u32, u32, K, u32, u32)>, AState> {
+fn closure(s: &AState, menu: Menu, policy: Policy, depth: usize) -> HashMap<StateKey, AState> {
     let mut seen: HashMap<_, AState> = HashMap::new();
     seen.insert(canon_key(s), s.clone());
     let mut frontier = vec![s.clone()];
@@ -53,8 +56,8 @@ fn closure(s: &AState, menu: Menu, policy: Policy, depth: usize) -> HashMap<Vec<
             for r in menu.applicable(&st, policy) {
                 if let Some(s2) = apply(&st, r) {
                     let k = canon_key(&s2);
-                    if !seen.contains_key(&k) {
-                        seen.insert(k, s2.clone());
+                    if let std::collections::hash_map::Entry::Vacant(e) = seen.entry(k) {
+                        e.insert(s2.clone());
                         next.push(s2);
                     }
                 }
@@ -73,8 +76,8 @@ pub fn joinable(a: &AState, b: &AState, menu: Menu, policy: Policy, depth: usize
 }
 
 /// 從 s 出發收集所有正規形(極大歸約序列的終點)。
-pub fn normal_forms(s: &AState, menu: Menu, policy: Policy, depth: usize) -> Vec<Vec<(u32, u32, K, u32, u32)>> {
-    let mut nfs: BTreeSet<Vec<(u32, u32, K, u32, u32)>> = BTreeSet::new();
+pub fn normal_forms(s: &AState, menu: Menu, policy: Policy, depth: usize) -> Vec<StateKey> {
+    let mut nfs: BTreeSet<StateKey> = BTreeSet::new();
     let mut stack = vec![(s.clone(), 0usize)];
     while let Some((st, d)) = stack.pop() {
         if d >= depth {
@@ -95,7 +98,13 @@ pub fn normal_forms(s: &AState, menu: Menu, policy: Policy, depth: usize) -> Vec
     nfs.into_iter().collect()
 }
 
-pub fn newman_check(menu: Menu, policy: Policy, n_events: usize, max_coord: u32, depth: usize) -> NewmanReport {
+pub fn newman_check(
+    menu: Menu,
+    policy: Policy,
+    n_events: usize,
+    max_coord: u32,
+    depth: usize,
+) -> NewmanReport {
     let all = enumerate_states(n_events, max_coord);
     // 排除重複 start(演示域:start 嚴格遞增 —— 詳見 rep.rs 的註記)
     let states: Vec<AState> = all
@@ -123,13 +132,10 @@ pub fn newman_check(menu: Menu, policy: Policy, n_events: usize, max_coord: u32,
             let mut y = x + 1;
             while y < rules.len() {
                 critical_pairs += 1;
-                match (apply(s, rules[x]), apply(s, rules[y])) {
-                    (Some(a), Some(b)) => {
-                        if !joinable(&a, &b, menu, policy, depth) {
-                            non_joinable.push((s.clone(), rules[x], rules[y], a, b));
-                        }
+                if let (Some(a), Some(b)) = (apply(s, rules[x]), apply(s, rules[y])) {
+                    if !joinable(&a, &b, menu, policy, depth) {
+                        non_joinable.push((s.clone(), rules[x], rules[y], a, b));
                     }
-                    _ => {}
                 }
                 y += 1;
             }
@@ -143,19 +149,24 @@ pub fn newman_check(menu: Menu, policy: Policy, n_events: usize, max_coord: u32,
         if nfs.len() == 1 {
             unique_ok += 1;
         } else {
-            multi_nf.push((s.clone(), nfs.iter().map(|k| {
-                // 重新構造狀態僅用於報告
-                let evs = k
-                    .iter()
-                    .map(|&(id, storage, kind, st, en)| crate::rep::Ev {
-                        id,
-                        storage,
-                        kind,
-                        it: crate::ast::Interval { start: st, end: en },
+            multi_nf.push((
+                s.clone(),
+                nfs.iter()
+                    .map(|k| {
+                        // 重新構造狀態僅用於報告
+                        let evs = k
+                            .iter()
+                            .map(|&(id, storage, kind, st, en)| crate::rep::Ev {
+                                id,
+                                storage,
+                                kind,
+                                it: crate::ast::Interval { start: st, end: en },
+                            })
+                            .collect();
+                        AState::new(evs)
                     })
-                    .collect();
-                AState::new(evs)
-            }).collect()));
+                    .collect(),
+            ));
         }
     }
 

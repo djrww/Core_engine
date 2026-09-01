@@ -74,9 +74,10 @@ impl Edit {
 /// 複合 e₁·e₂(先施 e₁,再施經 e₁ 位移的 e₂),歸一化到原源碼空間。
 ///
 /// 適用範圍(嚴格):e₂ 的效果區域與 e₁ 的替換區**不相交**。
-///   * e₂ 在 e₁ 之後:e₂ 的坐標經 e₁ 逆位移後回到原空間,得到並行的
-///     兩個互不重疊編輯(順序無關 —— M5 的合併語義);
-///   * e₂ 在 e₁ 之前:同理,返回 [e₂′, e₁]。
+/// * e₂ 在 e₁ 之後:e₂ 的坐標經 e₁ 逆位移後回到原空間,得到並行的
+///   兩個互不重疊編輯(順序無關 —— M5 的合併語義);
+/// * e₂ 在 e₁ 之前:同理,返回 [e₂′, e₁]。
+///
 /// 相疊(如 e₂ 改寫了 e₁ 插入的文本)需要真正的文本拼接,本函數如實
 /// 返回 None(該情形不屬於「去抖批次歸併」的語義範圍)。
 pub fn compose(e1: &Edit, e2: &Edit) -> Option<Vec<Edit>> {
@@ -150,8 +151,8 @@ pub fn is_pairwise_disjoint(edits: &[Edit]) -> bool {
             if a.is_empty() && b.is_empty() && a.start == b.start {
                 return false;
             }
-            let a_nonempty = a.len() > 0;
-            let b_nonempty = b.len() > 0;
+            let a_nonempty = !a.is_empty();
+            let b_nonempty = !b.is_empty();
             if a_nonempty && b_nonempty && a.overlaps(&b) {
                 return false;
             }

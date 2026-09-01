@@ -362,7 +362,7 @@ pub fn unsupported(src: &str) -> Vec<(&'static str, Span)> {
         ("unsafe", "unsafe"),
         ("async", "async"),
         ("match", "match"),
-        ("fn 泛型", "fn ") /* 佔位 */,
+        ("fn 泛型", "fn "), /* 佔位 */
     ] {
         let _ = w;
     }
@@ -382,29 +382,43 @@ pub fn unsupported(src: &str) -> Vec<(&'static str, Span)> {
     }
     // 詞級關鍵字
     for kw in [
-        "trait", "impl", "use", "mod", "pub", "unsafe", "async", "match", "macro_rules", "dyn",
+        "trait",
+        "impl",
+        "use",
+        "mod",
+        "pub",
+        "unsafe",
+        "async",
+        "match",
+        "macro_rules",
+        "dyn",
     ] {
         let mut from = 0;
         while let Some(pos) = src[from..].find(kw) {
             let start = from + pos;
             let end = start + kw.len();
             // 必須是獨立詞(兩側為邊界)
-            let before_ok = start == 0 || !src[..start].ends_with(|c: char| c.is_alphanumeric() || c == '_');
+            let before_ok =
+                start == 0 || !src[..start].ends_with(|c: char| c.is_alphanumeric() || c == '_');
             let after = src[end..].chars().next();
-            let after_ok = after.is_none() || !after.unwrap().is_alphanumeric() && after.unwrap() != '_';
+            let after_ok =
+                after.is_none() || !after.unwrap().is_alphanumeric() && after.unwrap() != '_';
             if before_ok && after_ok {
-                out.push((match kw {
-                    "trait" => "trait 項(排除)",
-                    "impl" => "impl 塊(排除)",
-                    "use" => "use 項(排除)",
-                    "mod" => "mod 項(排除)",
-                    "pub" => "可見性(pub,排除)",
-                    "unsafe" => "unsafe(排除)",
-                    "async" => "async(排除)",
-                    "match" => "match 模式(排除)",
-                    "macro_rules" => "macro_rules(排除)",
-                    _ => "dyn(排除)",
-                }, Span::new(start as u32, end as u32)));
+                out.push((
+                    match kw {
+                        "trait" => "trait 項(排除)",
+                        "impl" => "impl 塊(排除)",
+                        "use" => "use 項(排除)",
+                        "mod" => "mod 項(排除)",
+                        "pub" => "可見性(pub,排除)",
+                        "unsafe" => "unsafe(排除)",
+                        "async" => "async(排除)",
+                        "match" => "match 模式(排除)",
+                        "macro_rules" => "macro_rules(排除)",
+                        _ => "dyn(排除)",
+                    },
+                    Span::new(start as u32, end as u32),
+                ));
             }
             from = end;
         }
@@ -413,12 +427,16 @@ pub fn unsupported(src: &str) -> Vec<(&'static str, Span)> {
     let mut from = 0;
     let bytes = src.as_bytes();
     while from < bytes.len() {
-        if bytes[from] == b'\'' {
-            if from + 1 < bytes.len() && (bytes[from + 1].is_ascii_alphabetic() || bytes[from + 1] == b'_') {
-                out.push(("生命週期 `'a`(排除)", Span::new(from as u32, (from + 2) as u32)));
-                from += 2;
-                continue;
-            }
+        if bytes[from] == b'\''
+            && from + 1 < bytes.len()
+            && (bytes[from + 1].is_ascii_alphabetic() || bytes[from + 1] == b'_')
+        {
+            out.push((
+                "生命週期 `'a`(排除)",
+                Span::new(from as u32, (from + 2) as u32),
+            ));
+            from += 2;
+            continue;
         }
         from += 1;
     }
@@ -474,7 +492,9 @@ mod tests {
         let u = unsupported(src);
         let kinds: Vec<&str> = u.iter().map(|(k, _)| *k).collect();
         assert!(
-            kinds.iter().any(|k| k.contains("閉包") || k.contains("macro")),
+            kinds
+                .iter()
+                .any(|k| k.contains("閉包") || k.contains("macro")),
             "closure must be detected, got {:?}",
             kinds
         );

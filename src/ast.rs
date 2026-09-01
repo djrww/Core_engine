@@ -99,15 +99,15 @@ pub fn conflicts(k1: EvKind, k2: EvKind) -> bool {
     if b as u8 > a as u8 {
         std::mem::swap(&mut a, &mut b);
     }
-    match (a, b) {
+    matches!(
+        (a, b),
         (EvKind::BorrowMut, EvKind::BorrowMut)
-        | (EvKind::BorrowMut, EvKind::BorrowSh)
-        | (EvKind::BorrowMut, EvKind::Read)
-        | (EvKind::BorrowMut, EvKind::Move)
-        | (EvKind::BorrowMut, EvKind::Deref)
-        | (EvKind::BorrowSh, EvKind::Move) => true,
-        _ => false,
-    }
+            | (EvKind::BorrowMut, EvKind::BorrowSh)
+            | (EvKind::BorrowMut, EvKind::Read)
+            | (EvKind::BorrowMut, EvKind::Move)
+            | (EvKind::BorrowMut, EvKind::Deref)
+            | (EvKind::BorrowSh, EvKind::Move)
+    )
 }
 
 /// 從 CST 抽取事實層(具名節點樹上的結構遞歸;ERROR 區域不產事實,如實申報)。
@@ -135,7 +135,7 @@ fn lookup<'a>(scopes: &'a [Vec<usize>], facts: &'a Facts, name: &str) -> Option<
     None
 }
 
-fn child_of_kind<'a>(t: &'a Tree, node: u32, kind: Kind) -> Option<u32> {
+fn child_of_kind(t: &Tree, node: u32, kind: Kind) -> Option<u32> {
     t.node(node)
         .children
         .iter()
@@ -144,7 +144,13 @@ fn child_of_kind<'a>(t: &'a Tree, node: u32, kind: Kind) -> Option<u32> {
 }
 
 /// 收集聲明(綁定)。遍歷 fn 項與所有塊。
-fn collect_decls(t: &Tree, node: u32, facts: &mut Facts, scopes: &mut Vec<Vec<usize>>, param_scope: bool) {
+fn collect_decls(
+    t: &Tree,
+    node: u32,
+    facts: &mut Facts,
+    scopes: &mut Vec<Vec<usize>>,
+    param_scope: bool,
+) {
     let n = t.node(node);
     match n.kind {
         Kind::FnItem => {
@@ -197,9 +203,8 @@ fn collect_decls(t: &Tree, node: u32, facts: &mut Facts, scopes: &mut Vec<Vec<us
                     Kind::IfStmt | Kind::WhileStmt => {
                         // if / while 的子塊
                         for cc in t.node(c).children.clone() {
-                            if t.node(cc).kind == Kind::Block {
-                                collect_decls(t, cc, facts, scopes, false);
-                            } else if t.node(cc).kind == Kind::IfStmt {
+                            let kind = t.node(cc).kind;
+                            if kind == Kind::Block || kind == Kind::IfStmt {
                                 collect_decls(t, cc, facts, scopes, false);
                             }
                         }
@@ -304,7 +309,14 @@ impl<'a> EventCollector<'a> {
                     if let Some(en) = expr_node {
                         let borrowed = self.walk_expr_for_borrow(en);
                         if let Some((src, borrow_kind)) = borrowed {
-                            let rbi = self.scopes.last().unwrap().iter().rev().find(|&&b| self.facts.bindings[b].name == name).copied();
+                            let rbi = self
+                                .scopes
+                                .last()
+                                .unwrap()
+                                .iter()
+                                .rev()
+                                .find(|&&b| self.facts.bindings[b].name == name)
+                                .copied();
                             if let Some(rb) = rbi {
                                 if let Some(sb) = lookup(self.scopes, self.facts, &src) {
                                     self.facts.links.push(BorrowLink {
@@ -340,7 +352,9 @@ impl<'a> EventCollector<'a> {
             Kind::Expr => {
                 for c in self.t.node(node).children.clone() {
                     match self.t.node(c).kind {
-                        Kind::UnaryExpr | Kind::CallExpr | Kind::Block => self.walk_node(c, Ctx::Value),
+                        Kind::UnaryExpr | Kind::CallExpr | Kind::Block => {
+                            self.walk_node(c, Ctx::Value)
+                        }
                         Kind::Ident => {
                             let name = name_of(self.t, c);
                             let sp = self.t.node(c).span;
@@ -380,7 +394,11 @@ impl<'a> EventCollector<'a> {
                             self.emit(
                                 &name,
                                 sp,
-                                if is_mut { EvKind::BorrowMut } else { EvKind::BorrowSh },
+                                if is_mut {
+                                    EvKind::BorrowMut
+                                } else {
+                                    EvKind::BorrowSh
+                                },
                             );
                             // 借用的主體不再當 read 計
                         } else {
@@ -418,12 +436,8 @@ impl<'a> EventCollector<'a> {
                             }
                             self.walk_node(c, Ctx::CallArg);
                         }
-                        Kind::Ident => {
-                            if first {
-                                first = false; // callee
-                            } else {
-                                // 不太可能(參數一定是 Expr)
-                            }
+                        Kind::Ident if first => {
+                            first = false; // callee
                         }
                         _ => {}
                     }
@@ -551,8 +565,10 @@ pub struct RedEdge {
 pub fn red_edges(facts: &Facts, track: Track) -> Vec<RedEdge> {
     let (ivs, events) = intervals(facts, track);
     let mut out = Vec::new();
-    for b in 0..facts.bindings.len() {
-        let mut evs: Vec<usize> = (0..events.len()).filter(|&i| events[i].binding == b).collect();
+    for (b, ivs_b) in ivs.iter().enumerate() {
+        let mut evs: Vec<usize> = (0..events.len())
+            .filter(|&i| events[i].binding == b)
+            .collect();
         evs.sort_by_key(|&i| events[i].span.start);
         for x in 0..evs.len() {
             for y in (x + 1)..evs.len() {
@@ -562,12 +578,15 @@ pub fn red_edges(facts: &Facts, track: Track) -> Vec<RedEdge> {
                 if !conflicts(ei.kind, ej.kind) {
                     continue;
                 }
-                if ivs[b][x].overlaps(&ivs[b][y]) {
+                if ivs_b[x].overlaps(&ivs_b[y]) {
                     out.push(RedEdge {
                         a: i,
                         b: j,
                         binding: b,
-                        span: Span::new(ei.span.start.min(ej.span.start), ei.span.end.max(ej.span.end)),
+                        span: Span::new(
+                            ei.span.start.min(ej.span.start),
+                            ei.span.end.max(ej.span.end),
+                        ),
                     });
                 }
             }

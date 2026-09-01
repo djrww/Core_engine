@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  checks:
+    name: "checks · rust 1.98.0 (clippy / rustfmt / rust-analyzer)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install rust 1.98.0 + clippy + rustfmt + rust-analyzer
+        uses: dtolnay/rust-toolchain@1.98.0
+        with:
+          components: clippy, rustfmt, rust-analyzer
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt --check
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy --all-targets -D warnings
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: cargo test
+        run: cargo test --all-targets
+
+      - name: mechanical self-verification (cl0r0 / l9newman / fuzz)
+        run: |
+          cargo run --bin cl0r0
+          cargo run --bin l9newman
+          cargo run --bin fuzz
+
+  release:
+    name: "release · LTO + opt-level 3"
+    needs: checks
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install rust 1.98.0
+        uses: dtolnay/rust-toolchain@1.98.0
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: verify tag == crate version
+        run: |
+          crate_ver=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          tag_ver=${GITHUB_REF_NAME#v}
+          if [ "$crate_ver" != "$tag_ver" ]; then
+            echo "::error::tag v$tag_ver != Cargo.toml version $crate_ver"
+            exit 1
+          fi
+
+      - name: cargo build --release (lto=true, opt-level=3, codegen-units=1)
+        run: cargo build --release
+
+      - name: package binaries
+        run: |
+          tag=${GITHUB_REF_NAME}
+          tar czf "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
+            -C target/release cl0r0 l9newman fuzz
+
+      - name: create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=${GITHUB_REF_NAME}
+          gh release create "$tag" \
+            "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
+            --title "$tag (rust 1.98.0 · lto + opt-level 3)" \
+            --notes "rust 1.98.0 · opt-level=3 · lto=true · codegen-units=1 · debug=true(保留調試符號)"

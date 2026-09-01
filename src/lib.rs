@@ -7,8 +7,7 @@
 //!   * `tree`  : 樹的性質檢查(連續性公理、laminar、CW 復形)
 //!   * `sexp`  : 序列化(決定論 / 等價性的載體)
 //!   * `edit`  : 編輯單體(§2.1:位移函數、複合、結合律)
-//!   * `ast`   : 語義面 —— liveness 三軌(lexical / NLL / referent,§3.2)、
-//!              衝突圖(區間圖 ⊂ 弦圖 ⊂ 完美圖,§3.3)
+//!   * `ast`   : 語義面 —— liveness 三軌(§3.2)、衝突圖(區間圖 ⊂ 弦圖 ⊂ 完美圖,§3.3)
 //!   * `rep`   : 修法菜單重寫系統(§4:L8 遞減測度、L9 合流)
 //!   * `gen`   : 合法程式生成器 + 髒輸入生成器(屬性測試的輸入宇宙)
 //!   * `r0`    : R₀ Rust 子集 —— 附錄 B 覆蓋面契約 + 正則詞法 + unsupported 申報
@@ -17,10 +16,10 @@
 pub mod ast;
 pub mod edit;
 pub mod gen;
-pub mod lex;
 pub mod l9newman;
+pub mod lex;
 pub mod parse;
-pub mod rep;
 pub mod r0;
+pub mod rep;
 pub mod span;
 pub mod tree;

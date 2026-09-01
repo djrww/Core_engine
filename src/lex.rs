@@ -24,7 +24,7 @@ pub enum TokKind {
     If,
     Else,
     While,
-    Amp, // &
+    Amp,  // &
     Star, // *
     Plus,
     Minus,
@@ -109,9 +109,7 @@ pub fn lex(src: &str) -> Vec<Token> {
                 });
             }
             b'A'..=b'Z' | b'a'..=b'z' | b'_' => {
-                while i < bytes.len()
-                    && (bytes[i].is_ascii_alphanumeric() || bytes[i] == b'_')
-                {
+                while i < bytes.len() && (bytes[i].is_ascii_alphanumeric() || bytes[i] == b'_') {
                     i += 1;
                 }
                 let word = &src[start..i];
@@ -262,7 +260,10 @@ mod tests {
     #[test]
     fn lex_lexical_invariants() {
         // 對任意(含髒)輸入,詞法器必須平鋪全源碼。用一小段窮舉驗證。
-        let alphabet = ["x", "1", " ", "(", ")", "{", "}", ";", "&", "=", "//", "\n", "@", "fn", "let", "mut", "if", "else", "while", "true", "false", "*", "+", "-", "<", ":", ","];
+        let alphabet = [
+            "x", "1", " ", "(", ")", "{", "}", ";", "&", "=", "//", "\n", "@", "fn", "let", "mut",
+            "if", "else", "while", "true", "false", "*", "+", "-", "<", ":", ",",
+        ];
         fn gen(alphabet: &[&str], len: usize, cur: &mut String, n: usize, out: &mut Vec<String>) {
             if n >= len {
                 out.push(cur.clone());

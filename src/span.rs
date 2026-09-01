@@ -11,7 +11,10 @@ pub struct Span {
 
 impl Span {
     pub fn new(start: u32, end: u32) -> Span {
-        debug_assert!(start <= end, "span must be half-open [start, end) with start <= end");
+        debug_assert!(
+            start <= end,
+            "span must be half-open [start, end) with start <= end"
+        );
         Span { start, end }
     }
 

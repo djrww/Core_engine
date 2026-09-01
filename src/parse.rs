@@ -285,7 +285,7 @@ impl<'a> Parser<'a> {
 
     fn bump(&mut self) -> Option<(TokKind, Span)> {
         self.skip_trivia();
-        let t = self.cur()?.clone();
+        let t = *self.cur()?;
         if t.kind != TokKind::Trivia {
             self.last_struct = Some(t.kind);
         }
@@ -312,7 +312,10 @@ impl<'a> Parser<'a> {
             Span::new(0, self.src.len() as u32)
         } else {
             // 哨兵初值:等到第一個孩子附著後由 min/max 修正。
-            Span { start: u32::MAX, end: 0 }
+            Span {
+                start: u32::MAX,
+                end: 0,
+            }
         };
         self.nodes.push(Node {
             kind,
@@ -349,7 +352,10 @@ impl<'a> Parser<'a> {
             if s != u32::MAX {
                 self.nodes[id as usize].span = Span::new(s, e);
             } else {
-                let p = self.cur().map(|t| t.span.start).unwrap_or(self.src.len() as u32);
+                let p = self
+                    .cur()
+                    .map(|t| t.span.start)
+                    .unwrap_or(self.src.len() as u32);
                 self.nodes[id as usize].span = Span::new(p, p);
             }
         }
@@ -511,15 +517,7 @@ impl<'a> Parser<'a> {
                 ..
             } = *self;
             let rd = rd.as_ref().unwrap();
-            clone_subtree(
-                rd.old,
-                oid,
-                delta,
-                nodes,
-                cfgs,
-                first_tok,
-                last_tok,
-            )
+            clone_subtree(rd.old, oid, delta, nodes, cfgs, first_tok, last_tok)
         };
         self.attach(cloned);
         // 推進位置到重用子樹之後。
@@ -558,11 +556,17 @@ impl<'a> Parser<'a> {
         let id = self.open(Kind::FnItem)?;
         self.bump(); // fn
         if self.peek() != Some(TokKind::Ident) {
-            return Ok(self.item_err(frame, id));
+            return {
+                self.item_err(frame, id);
+                Ok(())
+            };
         }
         self.bump();
         if self.peek() != Some(TokKind::LParen) {
-            return Ok(self.item_err(frame, id));
+            return {
+                self.item_err(frame, id);
+                Ok(())
+            };
         }
         self.parse_params()?;
         self.parse_block()?;
@@ -632,15 +636,10 @@ impl<'a> Parser<'a> {
             return Ok(());
         }
         let _id = self.open(Kind::TypeRef)?;
-        loop {
-            match self.peek() {
-                Some(TokKind::Amp) => {
-                    self.bump();
-                    if self.peek() == Some(TokKind::Mut) {
-                        self.bump();
-                    }
-                }
-                _ => break,
+        while self.peek() == Some(TokKind::Amp) {
+            self.bump();
+            if self.peek() == Some(TokKind::Mut) {
+                self.bump();
             }
         }
         if self.peek() != Some(TokKind::Ident) {
@@ -737,22 +736,36 @@ impl<'a> Parser<'a> {
                     self.bump();
                 }
                 if self.peek() != Some(TokKind::Ident) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 self.bump();
                 if self.peek() == Some(TokKind::Eq) {
                     self.bump();
                     if self.peek() == Some(TokKind::Semi) {
-                        return Ok(self.stmt_err(frame, id));
+                        return {
+                            self.stmt_err(frame, id);
+                            Ok(())
+                        };
                     }
                     match self.parse_expr() {
                         Ok(()) => {}
                         Err(ParseIssue::Depth) => return Err(ParseIssue::Depth),
-                        Err(ParseIssue::Syntax) => return Ok(self.stmt_err(frame, id)),
+                        Err(ParseIssue::Syntax) => {
+                            return {
+                                self.stmt_err(frame, id);
+                                Ok(())
+                            }
+                        }
                     }
                 }
                 if self.peek() != Some(TokKind::Semi) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 self.bump();
                 self.close();
@@ -762,16 +775,27 @@ impl<'a> Parser<'a> {
                 let id = self.open(Kind::IfStmt)?;
                 self.bump();
                 if !expr_start(self.peek()) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 match self.parse_expr() {
                     Ok(()) => {}
                     Err(ParseIssue::Depth) => return Err(ParseIssue::Depth),
-                    Err(ParseIssue::Syntax) => return Ok(self.stmt_err(frame, id)),
+                    Err(ParseIssue::Syntax) => {
+                        return {
+                            self.stmt_err(frame, id);
+                            Ok(())
+                        }
+                    }
                 }
                 // 塊缺失 ⟹ 整個 if 是錯誤區域(切割時把壞語句整段移除)。
                 if self.peek() != Some(TokKind::LBrace) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 self.parse_block()?;
                 if self.peek() == Some(TokKind::Else) {
@@ -781,7 +805,10 @@ impl<'a> Parser<'a> {
                     } else if self.peek() == Some(TokKind::LBrace) {
                         self.parse_block()?;
                     } else {
-                        return Ok(self.stmt_err(frame, id));
+                        return {
+                            self.stmt_err(frame, id);
+                            Ok(())
+                        };
                     }
                 }
                 self.close();
@@ -791,15 +818,26 @@ impl<'a> Parser<'a> {
                 let id = self.open(Kind::WhileStmt)?;
                 self.bump();
                 if !expr_start(self.peek()) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 match self.parse_expr() {
                     Ok(()) => {}
                     Err(ParseIssue::Depth) => return Err(ParseIssue::Depth),
-                    Err(ParseIssue::Syntax) => return Ok(self.stmt_err(frame, id)),
+                    Err(ParseIssue::Syntax) => {
+                        return {
+                            self.stmt_err(frame, id);
+                            Ok(())
+                        }
+                    }
                 }
                 if self.peek() != Some(TokKind::LBrace) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 self.parse_block()?;
                 self.close();
@@ -808,15 +846,26 @@ impl<'a> Parser<'a> {
             _ => {
                 let id = self.open(Kind::ExprStmt)?;
                 if !expr_start(self.peek()) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 match self.parse_expr() {
                     Ok(()) => {}
                     Err(ParseIssue::Depth) => return Err(ParseIssue::Depth),
-                    Err(ParseIssue::Syntax) => return Ok(self.stmt_err(frame, id)),
+                    Err(ParseIssue::Syntax) => {
+                        return {
+                            self.stmt_err(frame, id);
+                            Ok(())
+                        }
+                    }
                 }
                 if self.peek() != Some(TokKind::Semi) {
-                    return Ok(self.stmt_err(frame, id));
+                    return {
+                        self.stmt_err(frame, id);
+                        Ok(())
+                    };
                 }
                 self.bump();
                 self.close();
@@ -831,18 +880,16 @@ impl<'a> Parser<'a> {
         }
         let id = self.open(Kind::Expr)?;
         self.parse_unary()?;
-        loop {
-            match self.peek() {
-                Some(TokKind::Plus)
+        while matches!(
+            self.peek(),
+            Some(TokKind::Plus)
                 | Some(TokKind::Minus)
                 | Some(TokKind::Star)
                 | Some(TokKind::EqEq)
-                | Some(TokKind::Lt) => {
-                    self.bump();
-                    self.parse_unary()?;
-                }
-                _ => break,
-            }
+                | Some(TokKind::Lt)
+        ) {
+            self.bump();
+            self.parse_unary()?;
         }
         self.close();
         let _ = id;
@@ -1083,8 +1130,8 @@ fn clone_subtree(
         last_tok.push(old.last_tok[*id as usize]);
     }
     // 確保父節點先於子節點被建:order 是 DFS 前序(父先)。
-    let root_new = map[oid as usize];
-    root_new
+
+    map[oid as usize]
 }
 
 // ===========================================================================
@@ -1160,11 +1207,7 @@ impl Tree {
             if node.span != Span::new(first.start, last.end) {
                 return Err(format!(
                     "node {} ({:?}) span {} != children union [{}, {})",
-                    id,
-                    node.kind,
-                    node.span,
-                    first.start,
-                    last.end
+                    id, node.kind, node.span, first.start, last.end
                 ));
             }
             let mut prev_end = first.start;
@@ -1232,10 +1275,7 @@ impl Tree {
 
     /// L7a:樹中是否有 ERROR 節點。
     pub fn n_errors(&self) -> usize {
-        self.nodes
-            .iter()
-            .filter(|n| n.kind == Kind::Error)
-            .count()
+        self.nodes.iter().filter(|n| n.kind == Kind::Error).count()
     }
 
     pub fn has_error(&self) -> bool {
@@ -1313,7 +1353,10 @@ impl Tree {
             out.push_str(n.kind.label());
             out.push_str(&format!(" {}", n.span));
             if n.kind == Kind::Trivia {
-                out.push_str(&format!(" {:?}", &t.src[n.span.start as usize..n.span.end as usize]));
+                out.push_str(&format!(
+                    " {:?}",
+                    &t.src[n.span.start as usize..n.span.end as usize]
+                ));
             }
             if n.children.is_empty() {
                 out.push(')');
@@ -1364,11 +1407,23 @@ mod tests {
     #[test]
     fn smoke_parse_garbage() {
         // 全化:任何輸入都產出樹,且 L1 回環逐字節成立。
-        for src in ["@@@", "fn", "{ let = ;", "if { } else", "x = = 3;", "()", "&mut & &*", "fn f(x: & &mut int) {}", "/* no block comment in CL0 */ x;", "let x = f(a, , b);"] {
+        for src in [
+            "@@@",
+            "fn",
+            "{ let = ;",
+            "if { } else",
+            "x = = 3;",
+            "()",
+            "&mut & &*",
+            "fn f(x: & &mut int) {}",
+            "/* no block comment in CL0 */ x;",
+            "let x = f(a, , b);",
+        ] {
             let t = parse(src).expect("total parser");
             assert_eq!(t.unparse(), src, "L1 garbage roundtrip for {:?}", src);
             assert!(t.laminar_ok(), "L5 laminar for {:?}", src);
-            t.validate_continuity().unwrap_or_else(|e| panic!("continuity for {:?}: {}", src, e));
+            t.validate_continuity()
+                .unwrap_or_else(|e| panic!("continuity for {:?}: {}", src, e));
         }
     }
 }

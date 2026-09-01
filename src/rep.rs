@@ -267,7 +267,12 @@ pub fn apply(s: &AState, r: Rule) -> Option<AState> {
                     e.storage = new_storage;
                 }
             }
-            s2.log.push(format!("{} (storage {} ↗ {})", r.label(), old_storage, new_storage));
+            s2.log.push(format!(
+                "{} (storage {} ↗ {})",
+                r.label(),
+                old_storage,
+                new_storage
+            ));
             Some(s2)
         }
         Rule::R3Swap(a, b) => {

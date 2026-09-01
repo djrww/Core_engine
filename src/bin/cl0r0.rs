@@ -4,7 +4,7 @@
 
 use cl0r0::ast::{self, Track};
 use cl0r0::parse::{parse, Kind};
-use cl0r0::rep::{self, AState, Ev, K, Menu, Policy, Rule};
+use cl0r0::rep::{self, AState, Ev, Menu, Policy, Rule, K};
 use cl0r0::span::Span;
 
 fn main() {
@@ -35,11 +35,23 @@ fn main() {
     );
     let rr = t.unparse() == src;
     println!("  L1 無損回環(unparse∘parse ≡ 源碼逐字節):{}", ok(rr));
-    println!("  L2 決定論(兩次解析序列化相同):{}", ok(parse(src).unwrap().sexp() == t.sexp()));
+    println!(
+        "  L2 決定論(兩次解析序列化相同):{}",
+        ok(parse(src).unwrap().sexp() == t.sexp())
+    );
     println!("  L5 區間嵌套(laminar):{}", ok(t.laminar_ok()));
-    println!("  連續性公理(父跨度 = 子跨度並):{}", ok(t.validate_continuity().is_ok()));
-    println!("  樹公理(連通/單父):{}", ok(t.validate_tree_shapes().is_ok()));
-    println!("  χ = |V| − |E| = 1(CW 複形,§3.4):{}", ok(cl0r0::parse::euler_characteristic(&t) == 1));
+    println!(
+        "  連續性公理(父跨度 = 子跨度並):{}",
+        ok(t.validate_continuity().is_ok())
+    );
+    println!(
+        "  樹公理(連通/單父):{}",
+        ok(t.validate_tree_shapes().is_ok())
+    );
+    println!(
+        "  χ = |V| − |E| = 1(CW 複形,§3.4):{}",
+        ok(cl0r0::parse::euler_characteristic(&t) == 1)
+    );
 
     // ---------- 具名投影 ----------
     println!("\n[具名投影 §1.3](匿名 token 與 trivia 投影掉;結構同態)");
@@ -47,15 +59,16 @@ fn main() {
 
     // ---------- 三軌 liveness + 衝突圖 ----------
     let facts = ast::extract(&t);
-    println!("\n[事實層 §3.2] 綁定 {} 事件 {} 借用鏈 {}", facts.bindings.len(), facts.events.len(), facts.links.len());
+    println!(
+        "\n[事實層 §3.2] 綁定 {} 事件 {} 借用鏈 {}",
+        facts.bindings.len(),
+        facts.events.len(),
+        facts.links.len()
+    );
     for (i, b) in facts.bindings.iter().enumerate() {
         println!(
             "  binding[{}] {} @{} (mut={} param={})",
-            i,
-            b.name,
-            b.span,
-            b.mutable,
-            b.is_param
+            i, b.name, b.span, b.mutable, b.is_param
         );
     }
     for e in &facts.events {
@@ -128,17 +141,25 @@ fn main() {
     }
     let s0 = AState::new(evs);
     let (nf, steps) = rep::normalize(s0.clone(), Menu::CommutativeTrim, Policy::Guarded);
-    println!("  初始:紅邊 {} 條;正規化 {} 步;最終紅邊 {} 條", s0.red_edges().len(), steps, nf.red_edges().len());
+    println!(
+        "  初始:紅邊 {} 條;正規化 {} 步;最終紅邊 {} 條",
+        s0.red_edges().len(),
+        steps,
+        nf.red_edges().len()
+    );
     let mut st = s0.clone();
     let mut plan = Vec::new();
     while let Some((s2, r)) = rep::step(&st, Menu::CommutativeTrim, Policy::Guarded) {
-        plan.push((r.clone(), st.red_edges().len(), s2.red_edges().len()));
+        plan.push((r, st.red_edges().len(), s2.red_edges().len()));
         st = s2;
     }
     for (r, before, after) in plan {
         println!("    {} : 紅邊 {} → {}", r.label(), before, after);
     }
-    println!("  結果(紅邊清零 = 幾何收斂,§3.5):{}", ok(nf.red_edges().is_empty()));
+    println!(
+        "  結果(紅邊清零 = 幾何收斂,§3.5):{}",
+        ok(nf.red_edges().is_empty())
+    );
 
     // ---------- ERROR 全化(L7)演示 ----------
     println!("\n[L7 ERROR 全化 §2.3]「寫到一半的檔案」");
@@ -150,21 +171,55 @@ fn main() {
     ] {
         let h = parse(half).expect("total");
         let spans = h.maximal_error_spans();
-        let mut cut = String::new();
-        let mut last = 0u32;
-        for sp in &spans {
-            cut.push_str(&half[last as usize..sp.start as usize]);
-            last = sp.end;
+        // 迭代淨化:反覆移除極大錯誤跨度至不動點(L7b,與 fuzz bin 同法);
+        // 殘餘只允許切縫 / EOF 處的空錯誤(缺失內容)。
+        let mut cur = half.to_string();
+        let mut seams: Vec<u32> = Vec::new();
+        let mut rounds = 0u32;
+        loop {
+            let rec = parse(&cur).expect("total");
+            let sps = rec.maximal_error_spans();
+            if sps.is_empty() {
+                break;
+            }
+            let mut next = String::new();
+            let mut last = 0u32;
+            for sp in &sps {
+                next.push_str(&cur[last as usize..sp.start as usize]);
+                seams.push(sp.start);
+                seams.push(sp.end);
+                last = sp.end;
+            }
+            next.push_str(&cur[last as usize..]);
+            if next == cur {
+                break;
+            }
+            cur = next;
+            rounds += 1;
+            if rounds >= 8 {
+                break;
+            }
         }
-        cut.push_str(&half[last as usize..]);
-        let rec = parse(&cut).expect("total");
+        let fin = parse(&cur).expect("total");
+        let mut residual = 0usize;
+        for n in &fin.nodes {
+            if n.kind != Kind::Error {
+                continue;
+            }
+            if !n.span.is_empty()
+                || !(n.span.start as usize == cur.len() || seams.contains(&n.span.start))
+            {
+                residual += 1;
+            }
+        }
         println!(
-            "  {:?}\n    → ERROR 節點 {} 個(跨度 {:?});挖除後重析:{} 錯誤 → L7b 良構極大:{}",
+            "  {:?}\n    → ERROR 跨度 {} 個({:?});迭代挖除 {} 輪後殘餘 {} 錯誤 → L7b 良構極大:{}",
             half,
             spans.len(),
             spans,
-            rec.n_errors(),
-            ok(rec.n_errors() == 0)
+            rounds,
+            residual,
+            ok(residual == 0)
         );
     }
 
@@ -178,7 +233,8 @@ fn main() {
         ok(cl0r0::r0::r0_lexical_invariants(r0src).is_ok()),
         ok(cl0r0::r0::lalr1_clean(r0src).is_ok())
     );
-    let outof = "fn main() { let c = |a| a; match c { 0 => {} } let v: Vec<int> = vs; println!(x); }";
+    let outof =
+        "fn main() { let c = |a| a; match c { 0 => {} } let v: Vec<int> = vs; println!(x); }";
     println!("  越界樣本:{:?}", outof);
     let u = cl0r0::r0::unsupported(outof);
     for (k, sp) in &u {
@@ -192,7 +248,12 @@ fn main() {
     println!("\n======================================================================");
     println!(" 總計:九律矩陣的機械檢查結果見 `tests/laws.rs` 與 `cargo run --bin l9newman`");
     println!("======================================================================");
-    let _ = (total_red, Rule::R1Shorten(0, 1), Kind::Root, Span::new(0, 0));
+    let _ = (
+        total_red,
+        Rule::R1Shorten(0, 1),
+        Kind::Root,
+        Span::new(0, 0),
+    );
 }
 
 fn ok(b: bool) -> &'static str {

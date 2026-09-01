@@ -5,17 +5,20 @@
 //!   L1 無損回環、L2 決定論、L5 嵌套、L6 投影一致、L7a 不假報、L7b 良構極大、
 //!   L8 遞減、L9 合流/唯一正規形(抽查)+ 編輯單體定律 + 連續性/樹公理 + T2。
 
-
+use cl0r0::ast;
 use cl0r0::gen::{gen_edit, gen_garbage, gen_half_file, gen_legal, Rng};
 use cl0r0::parse::{parse, reparse};
-use cl0r0::ast;
-use cl0r0::rep::{self, AState, Ev, K, Menu, Policy};
+use cl0r0::rep::{self, AState, Ev, Menu, Policy, K};
 use cl0r0::span::Span;
 
 fn main() {
     let mut rng = Rng::new(0xC10_2024_0001);
     let mut stats = Vec::<(String, usize, usize)>::new(); // (law, passed, failed)
-    let fail = |stats: &mut Vec<(String, usize, usize)>, law: &str, extra: &str, ok: bool, detail: std::fmt::Arguments| {
+    let fail = |stats: &mut Vec<(String, usize, usize)>,
+                law: &str,
+                extra: &str,
+                ok: bool,
+                detail: std::fmt::Arguments| {
         if let Some(e) = stats.iter_mut().find(|(l, _, _)| *l == law) {
             e.1 += 1;
             if !ok {
@@ -40,14 +43,26 @@ fn main() {
         let t = match parse(&src) {
             Ok(t) => t,
             Err(e) => {
-                fail(&mut stats, "L1", "deep", false, format_args!("parse err {:?}", e));
+                fail(
+                    &mut stats,
+                    "L1",
+                    "deep",
+                    false,
+                    format_args!("parse err {:?}", e),
+                );
                 continue;
             }
         };
         // L1
         let un = t.unparse();
         if un != src {
-            fail(&mut stats, "L1", "roundtrip", false, format_args!("{:?} != {:?}", un, src));
+            fail(
+                &mut stats,
+                "L1",
+                "roundtrip",
+                false,
+                format_args!("{:?} != {:?}", un, src),
+            );
         }
         // L2
         let t2 = parse(&src).unwrap();
@@ -61,15 +76,33 @@ fn main() {
         // 連續性 + 樹公理
         let c = t.validate_continuity().is_ok();
         if !c {
-            fail(&mut stats, "L1", "continuity", false, format_args!("{}", t.validate_continuity().unwrap_err()));
+            fail(
+                &mut stats,
+                "L1",
+                "continuity",
+                false,
+                format_args!("{}", t.validate_continuity().unwrap_err()),
+            );
         }
         let sh = t.validate_tree_shapes().is_ok();
         if !sh {
-            fail(&mut stats, "L1", "treeaxiom", false, format_args!("{}", t.validate_tree_shapes().unwrap_err()));
+            fail(
+                &mut stats,
+                "L1",
+                "treeaxiom",
+                false,
+                format_args!("{}", t.validate_tree_shapes().unwrap_err()),
+            );
         }
         // L7a:合法生成 ⇒ 無 ERROR
         if i % 3 == 0 && t.has_error() {
-            fail(&mut stats, "L7a", "no-false-error", false, format_args!("legal src has errors: {}", src));
+            fail(
+                &mut stats,
+                "L7a",
+                "no-false-error",
+                false,
+                format_args!("legal src has errors: {}", src),
+            );
         }
     }
     // 合法程式的密集樣本
@@ -78,16 +111,34 @@ fn main() {
         let src = gen_legal(&mut rng);
         let t = parse(&src).unwrap();
         if t.has_error() {
-            fail(&mut stats, "L7a", "no-false-error", false, format_args!("{}", src));
+            fail(
+                &mut stats,
+                "L7a",
+                "no-false-error",
+                false,
+                format_args!("{}", src),
+            );
         }
         if t.unparse() != src {
-            fail(&mut stats, "L1", "legal-roundtrip", false, format_args!("{}", src));
+            fail(
+                &mut stats,
+                "L1",
+                "legal-roundtrip",
+                false,
+                format_args!("{}", src),
+            );
         }
         // L6:具名投影一致性(與重析無關的靜態面:投影由表面層決定)
         let named1 = t.named_sexp();
         let t2 = parse(&src).unwrap();
         if t2.named_sexp() != named1 {
-            fail(&mut stats, "L6", "projection-consistency", false, format_args!(""));
+            fail(
+                &mut stats,
+                "L6",
+                "projection-consistency",
+                false,
+                format_args!(""),
+            );
         }
     }
 
@@ -101,11 +152,16 @@ fn main() {
         let spans = t.maximal_error_spans();
         for a in 0..spans.len() {
             for b in (a + 1)..spans.len() {
-                let strict =
-                    (spans[a].start < spans[b].start && spans[b].end < spans[a].end)
-                        || (spans[b].start < spans[a].start && spans[a].end < spans[b].end);
+                let strict = (spans[a].start < spans[b].start && spans[b].end < spans[a].end)
+                    || (spans[b].start < spans[a].start && spans[a].end < spans[b].end);
                 if strict {
-                    fail(&mut stats, "L7b", "non-nested", false, format_args!("{:?} vs {:?}", spans[a], spans[b]));
+                    fail(
+                        &mut stats,
+                        "L7b",
+                        "non-nested",
+                        false,
+                        format_args!("{:?} vs {:?}", spans[a], spans[b]),
+                    );
                 }
             }
         }
@@ -141,27 +197,49 @@ fn main() {
             if n.kind != cl0r0::parse::Kind::Error {
                 continue;
             }
-            if n.span.len() > 0 {
-                bad += 1;
-            } else if !(n.span.start as usize == cur.len() || seams.contains(&n.span.start)) {
+            let at_seam = n.span.start as usize == cur.len() || seams.contains(&n.span.start);
+            if !n.span.is_empty() || !at_seam {
                 bad += 1;
             }
         }
         if bad > 0 || rounds >= 8 {
-            fail(&mut stats, "L7b", "iterative-purify", false, format_args!("half={:?} cur={:?} bad={} rounds={}", half, cur, bad, rounds));
+            fail(
+                &mut stats,
+                "L7b",
+                "iterative-purify",
+                false,
+                format_args!(
+                    "half={:?} cur={:?} bad={} rounds={}",
+                    half, cur, bad, rounds
+                ),
+            );
         }
     }
 
     // ---------- L7a 窮舉小樣(另見 tests/laws.rs)----------
-    let alphabet = ["x", "1", ";", "{", "}", "(", ")", "&", "=", "let", "fn", "if", " "];
+    let alphabet = [
+        "x", "1", ";", "{", "}", "(", ")", "&", "=", "let", "fn", "if", " ",
+    ];
     exhaust(&alphabet, 0, 4, &mut String::new(), &mut |s| {
         let t = parse(s).unwrap();
         let ok1 = t.unparse() == s;
         if !ok1 {
-            fail(&mut stats, "L1", "exhaustive", false, format_args!("{:?}", s));
+            fail(
+                &mut stats,
+                "L1",
+                "exhaustive",
+                false,
+                format_args!("{:?}", s),
+            );
         }
         if !t.laminar_ok() {
-            fail(&mut stats, "L5", "exhaustive", false, format_args!("{:?}", s));
+            fail(
+                &mut stats,
+                "L5",
+                "exhaustive",
+                false,
+                format_args!("{:?}", s),
+            );
         }
     });
 
@@ -177,7 +255,13 @@ fn main() {
         if let Some(combo) = cl0r0::edit::compose(&e1, &e2) {
             let s3 = cl0r0::edit::apply_all(&src, &combo);
             if s2 != s3 {
-                fail(&mut stats, "M4", "apply-compose", false, format_args!("{:?} / {:?}", src, s2));
+                fail(
+                    &mut stats,
+                    "M4",
+                    "apply-compose",
+                    false,
+                    format_args!("{:?} / {:?}", src, s2),
+                );
             }
             // M5:兩個互不重疊的原空間編輯,任意順序歸併結果相同
             let f2 = gen_edit(&mut rng, src.len());
@@ -185,7 +269,13 @@ fn main() {
                 let a = cl0r0::edit::apply_all(&src, &[e1.clone(), f2.clone()]);
                 let b = cl0r0::edit::apply_all(&src, &[f2.clone(), e1.clone()]);
                 if a != b {
-                    fail(&mut stats, "M5", "order-independence", false, format_args!(""));
+                    fail(
+                        &mut stats,
+                        "M5",
+                        "order-independence",
+                        false,
+                        format_args!(""),
+                    );
                 }
             }
         }
@@ -195,7 +285,13 @@ fn main() {
             if let Some(y) = e2.shift(x) {
                 let total = e1.delta() + e2.delta();
                 if p > e1.old_end && x > e2.old_end && y as i64 != p as i64 + total {
-                    fail(&mut stats, "M2", "shift-sum", false, format_args!("p={} y={} total={}", p, y, total));
+                    fail(
+                        &mut stats,
+                        "M2",
+                        "shift-sum",
+                        false,
+                        format_args!("p={} y={} total={}", p, y, total),
+                    );
                 }
             }
         }
@@ -233,18 +329,33 @@ fn main() {
                 id: i as u32,
                 storage: 0,
                 kind,
-                it: ast::Interval { start: p, end: p + len },
+                it: ast::Interval {
+                    start: p,
+                    end: p + len,
+                },
             });
             p += len;
         }
         let s = AState::new(evs);
         if let Some((_, s2, r)) = rep::l8_check(&s, Menu::CommutativeTrim, Policy::Guarded) {
-            fail(&mut stats, "L8", "decrease", false, format_args!("{}: {:?}→{:?}", r.label(), s.measure(), s2.measure()));
+            fail(
+                &mut stats,
+                "L8",
+                "decrease",
+                false,
+                format_args!("{}: {:?}→{:?}", r.label(), s.measure(), s2.measure()),
+            );
         }
         // 一次正規化必須清零
         let (nf, steps) = rep::normalize(s, Menu::CommutativeTrim, Policy::Guarded);
         if !nf.red_edges().is_empty() || steps > 100 {
-            fail(&mut stats, "L9", "normalize", false, format_args!("steps={} red={}", steps, nf.red_edges().len()));
+            fail(
+                &mut stats,
+                "L9",
+                "normalize",
+                false,
+                format_args!("steps={} red={}", steps, nf.red_edges().len()),
+            );
         }
     }
 
@@ -255,7 +366,10 @@ fn main() {
     println!("╠══════════════════════════════════════════════════════════╣");
     for (law, pass, f) in &stats {
         total_fail += f;
-        println!("║ {:<6} 檢查 {} 次,失敗 {} 次                                    ║", law, pass, f);
+        println!(
+            "║ {:<6} 檢查 {} 次,失敗 {} 次                                    ║",
+            law, pass, f
+        );
     }
     println!("╠══════════════════════════════════════════════════════════╣");
     println!("║ 總失敗數:{}", total_fail);

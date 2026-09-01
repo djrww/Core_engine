@@ -20,7 +20,7 @@ impl Rng {
         Rng { state: seed.max(1) }
     }
 
-    pub fn next(&mut self) -> u64 {
+    pub fn next_u64(&mut self) -> u64 {
         // xorshift64
         let mut x = self.state;
         x ^= x << 13;
@@ -34,7 +34,7 @@ impl Rng {
         if n == 0 {
             0
         } else {
-            self.next() % n
+            self.next_u64() % n
         }
     }
 
@@ -79,7 +79,7 @@ fn gen_item(rng: &mut Rng, out: &mut String, depth: usize) {
         if rng.chance(1, 3) {
             out.push_str(": ");
             if rng.chance(1, 2) {
-                out.push_str("&");
+                out.push('&');
                 if rng.chance(1, 2) {
                     out.push_str("mut ");
                 }
@@ -229,7 +229,7 @@ fn gen_primary(rng: &mut Rng, out: &mut String, depth: usize) {
             if depth < 3 {
                 gen_block(rng, out, depth);
             } else {
-                out.push_str("1");
+                out.push('1');
             }
         }
     }
@@ -238,9 +238,49 @@ fn gen_primary(rng: &mut Rng, out: &mut String, depth: usize) {
 /// 任意(髒)字節串:覆蓋所有 token 種類、關鍵字碎片、註釋、非法字元。
 pub fn gen_garbage(rng: &mut Rng, max_len: usize) -> String {
     let vocab: &[&str] = &[
-        "x", "y", "f", "1", "77", "let", "mut", "fn", "if", "else", "while", "true", "false ",
-        "&", "&mut ", "*", "+", "-", "==", "<", "=", "(", ")", "{", "}", ";", ":", ",", " ",
-        " ", "  ", "\n", "\t", "//", "// comment\n", "@", "#", "%", "'", "\"", "\\", "`", "..",
+        "x",
+        "y",
+        "f",
+        "1",
+        "77",
+        "let",
+        "mut",
+        "fn",
+        "if",
+        "else",
+        "while",
+        "true",
+        "false ",
+        "&",
+        "&mut ",
+        "*",
+        "+",
+        "-",
+        "==",
+        "<",
+        "=",
+        "(",
+        ")",
+        "{",
+        "}",
+        ";",
+        ":",
+        ",",
+        " ",
+        " ",
+        "  ",
+        "\n",
+        "\t",
+        "//",
+        "// comment\n",
+        "@",
+        "#",
+        "%",
+        "'",
+        "\"",
+        "\\",
+        "`",
+        "..",
     ];
     let mut out = String::new();
     let n = rng.below(max_len as u64 + 1) as usize;
