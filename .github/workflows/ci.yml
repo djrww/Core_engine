@@ -72,7 +72,7 @@ jobs:
 
       - name: create GitHub Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         run: |
           tag=${GITHUB_REF_NAME}
           gh release create "$tag" \
