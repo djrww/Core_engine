@@ -13,6 +13,7 @@ use crate::gen::{gen_garbage, gen_legal, Rng};
 use crate::parse::parse;
 use crate::polonius_bridge::PoloniusBridge;
 use crate::rep_dd::{AState, Ev, K};
+use crate::rocq_export::RocqExporter;
 use crate::tactic_scheduler::TacticScheduler;
 
 #[derive(Clone, Debug)]
@@ -20,6 +21,7 @@ pub struct GeneratedArtifacts {
     pub dirty_samples_count: usize,
     pub generated_cpf_certificates: Vec<CPFCertificate>,
     pub generated_ari_problems: Vec<String>,
+    pub generated_rocq_theories: Vec<String>,
     pub polonius_facts_catalog: Vec<String>,
     pub total_certified_rate: f64,
 }
@@ -59,7 +61,7 @@ impl CertGeneratorFactory {
         dirty_streams
     }
 
-    /// 生產形式化證書與認證資產 (CPF XML / ARI COPS / Polonius Facts)
+    /// 生產形式化證書與認證資產 (CPF XML / ARI COPS / Rocq 9.2 .v / Polonius Facts)
     pub fn run_factory_production(batch_size: usize, seed: u64) -> GeneratedArtifacts {
         let mut rng = Rng::new(seed);
         let dirty_samples = Self::produce_dirty_universe(&mut rng, batch_size);
@@ -67,6 +69,7 @@ impl CertGeneratorFactory {
 
         let mut certificates = Vec::new();
         let mut ari_problems = Vec::new();
+        let mut rocq_theories = Vec::new();
         let mut polonius_catalog = Vec::new();
         let mut certified_count = 0usize;
 
@@ -114,13 +117,17 @@ impl CertGeneratorFactory {
             );
 
             if report.certified {
+                let mod_name = format!("CL0_AutoBatch_{:04}", i + 1);
                 let cert_kb = CPFCertificate::new_knuth_bendix(
-                    &format!("CL0-AutoBatch-{:04}", i + 1),
+                    &mod_name,
                     &witness.description(),
                     report.total_peaks,
                 );
                 if cert_kb.verify() == CertResult::Certified {
                     certified_count += 1;
+                    // 4. 導出 Rocq 9.2 形式化理論
+                    let rocq_v = RocqExporter::export_theory(&mod_name, &cert_kb);
+                    rocq_theories.push(rocq_v);
                     certificates.push(cert_kb);
                 }
             }
@@ -136,6 +143,7 @@ impl CertGeneratorFactory {
             dirty_samples_count: dirty_count,
             generated_cpf_certificates: certificates,
             generated_ari_problems: ari_problems,
+            generated_rocq_theories: rocq_theories,
             polonius_facts_catalog: polonius_catalog,
             total_certified_rate,
         }

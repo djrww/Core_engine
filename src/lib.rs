@@ -64,6 +64,7 @@ pub mod r0_lower;
 pub mod rep;
 pub mod rep_dd;
 pub mod reparse_verifier;
+pub mod rocq_export;
 pub mod rule_labeling;
 pub mod rustc_json;
 pub mod shrink;

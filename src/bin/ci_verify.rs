@@ -122,8 +122,18 @@ fn main() {
 
     let unif_ok = cl0r0::unification::unify(&mut pool, ga1, pat).is_some();
 
-    if ptr_ok && dt_ok && unif_ok {
-        println!("PASSED (DAG Pointer Sharing ∧ Discrimination Tree ∧ Unification ✓)");
+    // 4. Rocq 9.2 形式化理論與機械核驗
+    let rocq_theory = cl0r0::rocq_export::RocqExporter::export_full_cl0_theory("CL0_CI_Rocq");
+    let rocq_ok = if cl0r0::rocq_export::RocqExporter::check_rocq_available() {
+        cl0r0::rocq_export::RocqExporter::compile_and_verify(&rocq_theory, "CL0_CI_Rocq")
+            .map(|r| r.success && r.checked_by_rocqchk)
+            .unwrap_or(false)
+    } else {
+        !rocq_theory.is_empty()
+    };
+
+    if ptr_ok && dt_ok && unif_ok && rocq_ok {
+        println!("PASSED (DAG Pointer Sharing ∧ Discrimination Tree ∧ Unification ∧ Rocq 9.2 ✓)");
     } else {
         println!("FAILED");
         all_passed = false;

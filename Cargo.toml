@@ -57,6 +57,10 @@ path = "src/bin/lemma_stress_coverage.rs"
 name = "ci_verify"
 path = "src/bin/ci_verify.rs"
 
+[[bin]]
+name = "rocq_verify"
+path = "src/bin/rocq_verify.rs"
+
 [profile.release]
 debug = true
 opt-level = 3

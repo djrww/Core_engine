@@ -74,14 +74,43 @@ fn test_cert_and_dirty_generator_factory() {
     assert_eq!(artifacts.dirty_samples_count, 20);
     assert!(!artifacts.generated_cpf_certificates.is_empty());
     assert_eq!(artifacts.generated_ari_problems.len(), 20);
+    assert!(!artifacts.generated_rocq_theories.is_empty());
     assert_eq!(artifacts.polonius_facts_catalog.len(), 20);
     assert!(artifacts.total_certified_rate > 90.0);
 
     let mut rng = cl0r0::gen::Rng::new(0xCAFE);
     let dirty_universe = CertGeneratorFactory::produce_dirty_universe(&mut rng, 30);
     let (passed, failed) = CertGeneratorFactory::verify_dirty_robustness(&dirty_universe);
-    assert_eq!(failed, 0, "全化解析器对所有污料样本应 0 Panic 构造树");
+    assert_eq!(failed, 0, "全化解析器對所有污料樣本應 0 Panic 構造樹");
     assert_eq!(passed, 30);
+}
+
+#[test]
+fn test_rocq_9_2_formal_export_and_mechanical_check() {
+    let full_theory =
+        cl0r0::rocq_export::RocqExporter::export_full_cl0_theory("CL0_Integration_Rocq");
+    assert!(full_theory.contains("Inductive sort"));
+    assert!(full_theory.contains("Theorem lemma5_euler_characteristic_tree"));
+    assert!(full_theory.contains("Theorem star_trans"));
+
+    if cl0r0::rocq_export::RocqExporter::check_rocq_available() {
+        let res = cl0r0::rocq_export::RocqExporter::compile_and_verify(
+            &full_theory,
+            "CL0_Integration_Rocq",
+        );
+        assert!(
+            res.is_ok(),
+            "Rocq 9.2 should mechanically verify full theory: {:?}",
+            res
+        );
+        let rep = res.unwrap();
+        assert!(rep.success);
+        assert!(rep.vo_bytes > 0);
+        assert!(
+            rep.checked_by_rocqchk,
+            "rocqchk microkernel verification must succeed"
+        );
+    }
 }
 
 #[test]
