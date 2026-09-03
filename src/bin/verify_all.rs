@@ -194,6 +194,19 @@ fn main() {
         all_passed = false;
     }
 
+    // ------------------------------------------------------------------
+    // [Formal Lemma Registry] 形式化引理矩陣機械自証 (L1-L9, CW-Complex, DDMin, Chordal)
+    // ------------------------------------------------------------------
+    print!("[Formal Lemmas] 正在校驗 10 大形式化核心引理矩陣機械自証... ");
+    let lemma_results = cl0r0::lemmas::LemmaRegistry::verify_all_lemmas();
+    let all_lemmas_ok = lemma_results.iter().all(|r| r.is_certified());
+    if all_lemmas_ok {
+        println!("PASSED (10/10 形式化引理全部獲得機器證明見證)");
+    } else {
+        println!("FAILED (存在未通過引理)");
+        all_passed = false;
+    }
+
     println!("======================================================================");
     if all_passed {
         println!(" [自証結論]: 六大門禁 100% 全部通過！系統符合雙載體與 CoCo 2026 發布標準。");

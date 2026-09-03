@@ -30,6 +30,10 @@ impl Rng {
         x
     }
 
+    pub fn next_u32(&mut self) -> u32 {
+        self.next_u64() as u32
+    }
+
     pub fn below(&mut self, n: u64) -> u64 {
         if n == 0 {
             0

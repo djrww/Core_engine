@@ -139,7 +139,7 @@ impl Kind {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Node {
     pub kind: Kind,
     pub span: Span,
@@ -155,7 +155,7 @@ pub struct Cfg {
     pub next: Option<TokKind>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Tree {
     pub src: String,
     pub nodes: Vec<Node>,
@@ -1320,7 +1320,12 @@ impl Tree {
         while let Some(id) = stack.pop() {
             let node = &self.nodes[id as usize];
             if node.children.is_empty() {
-                out.push_str(&self.src[node.span.start as usize..node.span.end as usize]);
+                if node.span.start != u32::MAX
+                    && node.span.start <= node.span.end
+                    && node.span.end as usize <= self.src.len()
+                {
+                    out.push_str(&self.src[node.span.start as usize..node.span.end as usize]);
+                }
             } else {
                 for &c in node.children.iter().rev() {
                     stack.push(c);

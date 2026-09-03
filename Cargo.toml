@@ -45,6 +45,18 @@ path = "src/bin/fuzz_daemon.rs"
 name = "fuzz"
 path = "src/bin/fuzz.rs"
 
+[[bin]]
+name = "cl0r0_lsp"
+path = "src/bin/lsp_server.rs"
+
+[[bin]]
+name = "lemma_stress_coverage"
+path = "src/bin/lemma_stress_coverage.rs"
+
+[[bin]]
+name = "ci_verify"
+path = "src/bin/ci_verify.rs"
+
 [profile.release]
 debug = true
 opt-level = 3

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, C1, CC1]
+    branches: [main, C1, CC1, CC2]
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
       - name: cargo test
         run: cargo test --all-targets
 
-      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner)
+      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage)
         run: |
           cargo run --bin cl0r0
           cargo run --bin l9newman
@@ -45,6 +45,8 @@ jobs:
           cargo run --bin pipeline_runner
           cargo run --bin cert_factory
           cargo run --bin fuzz
+          cargo run --bin lemma_stress_coverage
+          cargo run --bin ci_verify
 
   release:
     name: "release · LTO + opt-level 3"
@@ -77,7 +79,7 @@ jobs:
         run: |
           tag=${GITHUB_REF_NAME}
           tar czf "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
-            -C target/release cl0r0 l9newman dd_verify verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon
+            -C target/release cl0r0 l9newman dd_verify verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify
 
       - name: create or update GitHub Release
         env:

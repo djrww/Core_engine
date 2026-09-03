@@ -26,29 +26,51 @@
 //!   * `lsp_bridge`            : Language Server Protocol 交互式修法橋接 (附 Newman/DD 解釋)
 //!   * `gen`                   : 合法程式 + 髒輸入生成器
 //!   * `l9newman`              : 機械的 Newman 通道
+//!   * `mir`                   : MIR 控制流圖、Move 分析、Drop 展開與 NLL 借用檢查器 (§8.1)
+//!   * `modular_contracts`     : OOPSLA 2025 模組化函數契約、Reborrow 懸掛與循環不動點求解器 (§8.2)
+//!   * `proof_resources`       : Aeneas 反向函數、Creusot 預言模型與 Prusti 分離邏輯 (§8.3)
+//!   * `variance_dropck_ub`    : 型別變異性 (Variance)、Dropck 針眼法則與 UB 診斷預言機 (§8.4)
+//!   * `diff_tree`             : 持久化結構共享 AST 與狀態差分增量引擎 (§9.1)
+//!   * `differential_checker`  : 跨引擎語意差分測試、黃金對賬與 DDMin 自動收斂器 (§9.2)
 
 pub mod ari_export;
 pub mod ast;
 pub mod cert_generator_factory;
 pub mod cpf_cert;
+pub mod dag_term;
 pub mod dd_checker;
+pub mod diff_tree;
+pub mod differential_checker;
+pub mod discrimination_tree;
 pub mod edit;
 pub mod gen;
+pub mod isabelle_export;
+pub mod json_report;
 pub mod l9newman;
+pub mod lemma_stress_generator;
+pub mod lemmas;
 pub mod lex;
 pub mod lsp_bridge;
+pub mod maude_engine;
+pub mod mir;
+pub mod modular_contracts;
 pub mod parse;
 pub mod patch_engine;
 pub mod pipeline_synthesis;
 pub mod polonius_bridge;
+pub mod proof_resources;
 pub mod r0;
 pub mod r0_lower;
 pub mod rep;
 pub mod rep_dd;
 pub mod reparse_verifier;
+pub mod rule_labeling;
 pub mod rustc_json;
 pub mod shrink;
 pub mod span;
 pub mod span_monad;
 pub mod tactic_scheduler;
+pub mod tactics;
 pub mod tree;
+pub mod unification;
+pub mod variance_dropck_ub;
