@@ -666,6 +666,7 @@ impl<'a> Parser<'a> {
         }
         self.bump();
         loop {
+            let start_pos = self.pos;
             match self.peek() {
                 None => break,
                 Some(TokKind::RBrace) => {
@@ -673,6 +674,9 @@ impl<'a> Parser<'a> {
                     break;
                 }
                 _ => self.parse_stmt()?,
+            }
+            if self.pos == start_pos {
+                self.bump();
             }
         }
         self.close();
@@ -1000,8 +1004,8 @@ impl<'a> ReuseData<'a> {
                         dirty[id] = true;
                     }
                 } else {
-                    // 純插入:嚴格落在節點內部才算髒。
-                    if node.span.start < s && s < node.span.end {
+                    // 純插入: 落在節點閉區間內算髒。
+                    if node.span.start <= s && s <= node.span.end {
                         dirty[id] = true;
                     }
                 }
@@ -1047,6 +1051,10 @@ impl<'a> ReuseData<'a> {
             if node.kind != kind || rd.dirty[oid as usize] {
                 continue;
             }
+            let nspan = rd.new_span[oid as usize];
+            if nspan.end <= pos {
+                continue;
+            }
             let cfg = &rd.old.cfgs[oid as usize];
             if cfg.stack.as_slice() != stack {
                 continue;
@@ -1055,7 +1063,6 @@ impl<'a> ReuseData<'a> {
                 continue;
             }
             // 後一結構 token 必須一致(LL(1) 邊界條件)。
-            let nspan = rd.new_span[oid as usize];
             let mut i = tok_pos;
             while i < toks.len() && toks[i].span.start < nspan.end {
                 i += 1;
@@ -1088,11 +1095,12 @@ fn clone_subtree(
     let mut map = vec![u32::MAX; old.nodes.len()];
     let mut order: Vec<u32> = Vec::new();
     let mut stackv: Vec<u32> = vec![oid];
+    let base_nid = nodes.len() as u32;
     while let Some(id) = stackv.pop() {
         if map[id as usize] != u32::MAX {
             continue;
         }
-        let nid = nodes.len() as u32;
+        let nid = base_nid + order.len() as u32;
         map[id as usize] = nid;
         order.push(id);
         // 先推子節點(稍後統一重映射 children)。

@@ -484,7 +484,7 @@ fn name_of(t: &Tree, node: u32) -> String {
 // 三軌 liveness 與衝突圖
 // ===========================================================================
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Interval {
     pub start: u32,
     pub end: u32,

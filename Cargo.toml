@@ -1,8 +1,8 @@
 [package]
 name = "cl0r0"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
-description = "CL0/R0 dual carrier: surface syntax trees, nine laws (L1-L9), mechanical self-verification"
+description = "CL0/R0 dual carrier: surface syntax trees, nine laws (L1-L9), decreasing diagrams, mechanical self-verification"
 license = "MIT"
 
 [lib]
@@ -16,6 +16,30 @@ path = "src/bin/cl0r0.rs"
 [[bin]]
 name = "l9newman"
 path = "src/bin/l9newman.rs"
+
+[[bin]]
+name = "dd_verify"
+path = "src/bin/dd_verify.rs"
+
+[[bin]]
+name = "verify_all"
+path = "src/bin/verify_all.rs"
+
+[[bin]]
+name = "pipeline_runner"
+path = "src/bin/pipeline_runner.rs"
+
+[[bin]]
+name = "cert_factory"
+path = "src/bin/cert_factory.rs"
+
+[[bin]]
+name = "coco_benchmark"
+path = "src/bin/coco_benchmark.rs"
+
+[[bin]]
+name = "fuzz_daemon"
+path = "src/bin/fuzz_daemon.rs"
 
 [[bin]]
 name = "fuzz"
