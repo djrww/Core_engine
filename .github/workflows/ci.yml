@@ -20,6 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: install system dependencies (why3 + z3)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y why3 z3
+          why3 config detect || true
+
       - name: install rust 1.98.0 + clippy + rustfmt + rust-analyzer
         uses: dtolnay/rust-toolchain@1.98.0
         with:
@@ -36,7 +42,7 @@ jobs:
       - name: cargo test
         run: cargo test --all-targets
 
-      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify)
+      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify / creusot_verify)
         run: |
           cargo run --bin cl0r0
           cargo run --bin l9newman
@@ -48,6 +54,7 @@ jobs:
           cargo run --bin lemma_stress_coverage
           cargo run --bin ci_verify
           cargo run --bin rocq_verify
+          cargo run --bin creusot_verify
 
   release:
     name: "release · LTO + opt-level 3"
@@ -80,7 +87,7 @@ jobs:
         run: |
           tag=${GITHUB_REF_NAME}
           tar czf "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
-            -C target/release cl0r0 l9newman dd_verify verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify rocq_verify
+            -C target/release cl0r0 l9newman dd_verify verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify rocq_verify creusot_verify
 
       - name: create or update GitHub Release
         env:

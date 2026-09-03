@@ -167,10 +167,11 @@ impl<T: Clone> ProphecyCell<T> {
     }
 }
 
-/// Creusot 預言環境
+/// Creusot 預言環境與可變借用追蹤器 (Creusot Prophecy Tracker)
 #[derive(Clone, Debug, Default)]
 pub struct ProphecyEnvironment {
     pub cells: HashMap<String, ProphecyCell<i64>>,
+    pub reborrow_parents: HashMap<String, String>, // child_borrow -> parent_borrow
 }
 
 impl ProphecyEnvironment {
@@ -183,8 +184,37 @@ impl ProphecyEnvironment {
             .insert(var_name.to_string(), ProphecyCell::new(current, prophecy));
     }
 
+    /// 註冊 Reborrow: 子借用繼承父借用的 current 值，並在結束時傳遞預言值
+    pub fn register_reborrow(&mut self, parent_name: &str, child_name: &str) -> Result<(), String> {
+        let parent_cell = self
+            .cells
+            .get(parent_name)
+            .ok_or_else(|| format!("Parent borrow {} not found", parent_name))?
+            .clone();
+
+        // 子借用具有相同的初始 current 和預期的 prophecy
+        self.cells.insert(
+            child_name.to_string(),
+            ProphecyCell::new(parent_cell.current_val, parent_cell.prophecy_val),
+        );
+        self.reborrow_parents
+            .insert(child_name.to_string(), parent_name.to_string());
+        Ok(())
+    }
+
     pub fn resolve_borrow(&mut self, var_name: &str) -> Option<i64> {
-        self.cells.get_mut(var_name).map(|cell| cell.resolve())
+        if let Some(cell) = self.cells.get_mut(var_name) {
+            let final_val = cell.resolve();
+            // 若為子借用，則自動更新父借用的 current 狀態
+            if let Some(parent) = self.reborrow_parents.get(var_name).cloned() {
+                if let Some(pcell) = self.cells.get_mut(&parent) {
+                    pcell.current_val = final_val;
+                }
+            }
+            Some(final_val)
+        } else {
+            None
+        }
     }
 }
 
@@ -311,6 +341,20 @@ mod tests {
         assert_eq!(res, Some(200));
         assert_eq!(penv.cells["ptr"].current_val, 200);
         assert!(penv.cells["ptr"].is_resolved);
+    }
+
+    #[test]
+    fn test_creusot_reborrow_prophecy_chain() {
+        let mut penv = ProphecyEnvironment::new();
+        penv.register_borrow("parent", 10, 50);
+        assert!(penv.register_reborrow("parent", "child").is_ok());
+
+        assert_eq!(penv.cells["child"].current_val, 10);
+        assert_eq!(penv.cells["child"].prophecy_val, 50);
+
+        let child_res = penv.resolve_borrow("child");
+        assert_eq!(child_res, Some(50));
+        assert_eq!(penv.cells["parent"].current_val, 50);
     }
 
     #[test]

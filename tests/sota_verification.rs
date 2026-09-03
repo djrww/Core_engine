@@ -676,16 +676,41 @@ fn test_aeneas_creusot_prusti_proof_resources() {
         100
     );
 
-    // 2. Creusot 預言單元 Resolve
+    // 2. Creusot 預言單元 Resolve 與 Reborrow 鏈
     let mut penv = ProphecyEnvironment::new();
     penv.register_borrow("acc", 50, 75);
-    assert_eq!(penv.resolve_borrow("acc"), Some(75));
+    assert!(penv.register_reborrow("acc", "acc_child").is_ok());
+    assert_eq!(penv.resolve_borrow("acc_child"), Some(75));
+    assert_eq!(penv.cells["acc"].current_val, 75);
 
     // 3. Prusti 分數權限拆分與合併守恆
     let p_full = Permission::Exclusive;
     let (p1, p2) = p_full.split().unwrap();
     let p_rejoined = p1.join(&p2).unwrap();
     assert_eq!(p_rejoined, Permission::Exclusive);
+}
+
+#[test]
+fn test_creusot_why3_theory_and_pearlite_contracts() {
+    let theory = cl0r0::creusot_export::CreusotExporter::export_full_creusot_theory(
+        "CL0_Creusot_Integration",
+    );
+    assert!(theory.contains("type mut_borrow"));
+    assert!(theory.contains("predicate reborrow_valid"));
+    assert!(theory.contains("lemma_l18_diff_structural_sharing"));
+
+    if cl0r0::creusot_export::CreusotExporter::check_why3_available()
+        && cl0r0::creusot_export::CreusotExporter::check_z3_available()
+    {
+        let res = cl0r0::creusot_export::CreusotExporter::verify_with_why3(
+            &theory,
+            "CL0_Creusot_Integration",
+        );
+        assert!(res.is_ok(), "Why3 + Z3 verification failed: {:?}", res);
+        let rep = res.unwrap();
+        assert!(rep.success);
+        assert_eq!(rep.valid_goals, rep.total_goals);
+    }
 }
 
 #[test]

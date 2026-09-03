@@ -37,6 +37,7 @@ pub mod ari_export;
 pub mod ast;
 pub mod cert_generator_factory;
 pub mod cpf_cert;
+pub mod creusot_export;
 pub mod dag_term;
 pub mod dd_checker;
 pub mod diff_tree;
