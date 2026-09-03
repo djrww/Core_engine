@@ -30,13 +30,17 @@ fn main() {
     let mut all_passed = true;
 
     // ------------------------------------------------------------------
-    // [CI Gate 1]: 10 大形式化引理自証
+    // [CI Gate 1]: 18 大形式化引理自証
     // ------------------------------------------------------------------
-    print!("[CI Gate 1/7] 正在驗證 10 大形式化核心引理機器證明見證... ");
+    print!("[CI Gate 1/7] 正在驗證 18 大形式化核心引理機器證明見證... ");
     let lemma_res = LemmaRegistry::verify_all_lemmas();
     let lemmas_ok = lemma_res.iter().all(|r| r.is_certified());
     if lemmas_ok {
-        println!("PASSED (10/10 形式化引理 100% 機器自証通過)");
+        println!(
+            "PASSED ({}/{} 形式化引理 100% 機器自証通過)",
+            lemma_res.len(),
+            lemma_res.len()
+        );
     } else {
         println!("FAILED");
         all_passed = false;

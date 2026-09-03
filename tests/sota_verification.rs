@@ -290,7 +290,7 @@ fn test_delta_shrinker() {
 #[test]
 fn test_formal_lemmas_mechanical_registry() {
     let results = cl0r0::lemmas::LemmaRegistry::verify_all_lemmas();
-    assert!(!results.is_empty());
+    assert_eq!(results.len(), 18, "Must verify all 18 formal lemmas");
     for res in results {
         assert!(res.is_certified(), "Lemma must be certified: {:?}", res);
     }

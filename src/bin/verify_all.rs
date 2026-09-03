@@ -195,13 +195,17 @@ fn main() {
     }
 
     // ------------------------------------------------------------------
-    // [Formal Lemma Registry] 形式化引理矩陣機械自証 (L1-L9, CW-Complex, DDMin, Chordal)
+    // [Formal Lemma Registry] 形式化引理矩陣機械自証 (L1-L18 全量 18 大形式化引理)
     // ------------------------------------------------------------------
-    print!("[Formal Lemmas] 正在校驗 10 大形式化核心引理矩陣機械自証... ");
+    print!("[Formal Lemmas] 正在校驗 18 大形式化核心引理矩陣機械自証... ");
     let lemma_results = cl0r0::lemmas::LemmaRegistry::verify_all_lemmas();
     let all_lemmas_ok = lemma_results.iter().all(|r| r.is_certified());
     if all_lemmas_ok {
-        println!("PASSED (10/10 形式化引理全部獲得機器證明見證)");
+        println!(
+            "PASSED ({}/{} 形式化引理全部獲得機器證明見證)",
+            lemma_results.len(),
+            lemma_results.len()
+        );
     } else {
         println!("FAILED (存在未通過引理)");
         all_passed = false;
