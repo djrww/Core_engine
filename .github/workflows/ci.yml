@@ -84,8 +84,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag=${GITHUB_REF_NAME}
-          gh release create "$tag" \
-            "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
-            --title "$tag (rust 1.98.0 · lto + opt-level 3)" \
-            --notes "rust 1.98.0 · opt-level=3 · lto=true · codegen-units=1 · debug=true(SOTA Decreasing Diagrams + Newman Fast Path + 5-Stage Synthesis)" \
-            --clobber || gh release upload "$tag" "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" --clobber
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" --clobber
+          else
+            gh release create "$tag" "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
+              --title "$tag (rust 1.98.0 · lto + opt-level 3)" \
+              --notes "rust 1.98.0 · opt-level=3 · lto=true · codegen-units=1 · debug=true (SOTA Decreasing Diagrams + Newman Fast Path + 5-Cluster Synthesis & Cert Generator Factory)"
+          fi
