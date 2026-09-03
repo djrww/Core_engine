@@ -153,6 +153,11 @@ fn collect_decls(
 ) {
     let n = t.node(node);
     match n.kind {
+        Kind::Root => {
+            for &c in &n.children {
+                collect_decls(t, c, facts, scopes, param_scope);
+            }
+        }
         Kind::FnItem => {
             let body = child_of_kind(t, node, Kind::Block).unwrap();
             scopes.push(Vec::new());
@@ -277,6 +282,11 @@ impl<'a> EventCollector<'a> {
     fn walk_node(&mut self, node: u32, ctx: Ctx) {
         let kind = self.t.node(node).kind;
         match kind {
+            Kind::Root => {
+                for &c in &self.t.node(node).children {
+                    self.walk_node(c, ctx);
+                }
+            }
             Kind::FnItem => {
                 let body = child_of_kind(self.t, node, Kind::Block).unwrap();
                 self.walk_node(body, Ctx::Value);
