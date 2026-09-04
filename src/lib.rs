@@ -52,3 +52,8 @@ pub mod span;
 pub mod span_monad;
 pub mod tactic_scheduler;
 pub mod tree;
+
+#[cfg(feature = "experimental")]
+pub mod maude_engine;
+#[cfg(feature = "experimental")]
+pub mod rocq_export;

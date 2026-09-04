@@ -34,7 +34,7 @@ jobs:
         run: cargo clippy --all-targets --all-features -- -D warnings
 
       - name: cargo test
-        run: cargo test --all-targets
+        run: cargo test --all-targets --all-features
 
       - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner)
         run: |
