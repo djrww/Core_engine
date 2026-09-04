@@ -311,11 +311,9 @@ impl<'a> Parser<'a> {
         let span = if kind == Kind::Root {
             Span::new(0, self.src.len() as u32)
         } else {
-            // 哨兵初值:等到第一個孩子附著後由 min/max 修正。
-            Span {
-                start: u32::MAX,
-                end: 0,
-            }
+            // Provisional empty span until finalize() recomputes from children.
+            // Must stay a valid half-open interval (start <= end) in all builds.
+            Span::new(0, 0)
         };
         self.nodes.push(Node {
             kind,
@@ -652,6 +650,9 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_block(&mut self) -> Result<(), ParseIssue> {
+        if self.depth >= RECURSION_LIMIT {
+            return Err(ParseIssue::Depth);
+        }
         if self.try_reuse(Kind::Block).is_some() {
             return Ok(());
         }
@@ -720,6 +721,9 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_stmt(&mut self) -> Result<(), ParseIssue> {
+        if self.depth >= RECURSION_LIMIT {
+            return Err(ParseIssue::Depth);
+        }
         for k in [
             Kind::LetStmt,
             Kind::IfStmt,
@@ -879,6 +883,10 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_expr(&mut self) -> Result<(), ParseIssue> {
+        // Depth gate before any further recursion / reuse work.
+        if self.depth >= RECURSION_LIMIT {
+            return Err(ParseIssue::Depth);
+        }
         if self.try_reuse(Kind::Expr).is_some() {
             return Ok(());
         }
@@ -900,6 +908,8 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
+    /// Unary prefix chains (`&`, `&mut`, `*`) are collected iteratively so a
+    /// long prefix does not deepen the Rust call stack beyond one UnaryExpr frame.
     fn parse_unary(&mut self) -> Result<(), ParseIssue> {
         let has_prefix = matches!(self.peek(), Some(TokKind::Amp) | Some(TokKind::Star));
         if has_prefix {
@@ -1022,7 +1032,11 @@ impl<'a> ReuseData<'a> {
                     d += e.delta();
                 }
             }
-            let ns = node.span.shift(d);
+            let Some(ns) = node.span.checked_shift(d) else {
+                // Overflow/underflow ⇒ treat as dirty (not reusable).
+                dirty[id] = true;
+                continue;
+            };
             new_span[id] = ns;
             by_start.entry(ns.start).or_default().push(id as u32);
         }
@@ -1118,7 +1132,11 @@ fn clone_subtree(
     };
     for id in &order {
         let nnode = old.nodes[*id as usize].clone();
-        let nspan = nnode.span.shift(delta);
+        // Dirty nodes are excluded from reuse, so a uniform delta must fit in u32.
+        let nspan = nnode
+            .span
+            .checked_shift(delta)
+            .expect("clone_subtree: span shift overflow on non-dirty node");
         let children = nnode
             .children
             .iter()
@@ -1433,5 +1451,82 @@ mod tests {
             t.validate_continuity()
                 .unwrap_or_else(|e| panic!("continuity for {:?}: {}", src, e));
         }
+    }
+
+    /// B-4: nested blocks at / past RECURSION_LIMIT must yield Depth (no panic).
+    #[test]
+    fn deep_block_nesting_hits_depth_limit() {
+        // Each `{` opens a Block (+ ExprStmt path varies). Build pure nested blocks
+        // inside a fn so parse_block recursion dominates.
+        fn nested_blocks(n: usize) -> String {
+            let mut s = String::from("fn f() ");
+            for _ in 0..n {
+                s.push('{');
+            }
+            for _ in 0..n {
+                s.push('}');
+            }
+            s
+        }
+        // Comfortably under the limit: must succeed.
+        let under = nested_blocks(32);
+        parse(&under).expect("depth 32 blocks should parse");
+
+        // Far beyond the limit: must report Depth without aborting the process.
+        for n in [256usize, 300, 1000, 10_000] {
+            let src = nested_blocks(n);
+            match parse(&src) {
+                Err(ParseIssue::Depth) => {}
+                Ok(_) => panic!("expected Depth for {} nested blocks", n),
+                Err(other) => panic!("unexpected issue {:?} for {} blocks", other, n),
+            }
+        }
+    }
+
+    /// B-4: long iterative unary prefix must not exhaust the depth budget alone.
+    #[test]
+    fn long_unary_prefix_is_iterative() {
+        let stars = "*".repeat(200);
+        let src = format!("fn f() {{ let x = {}y; }}", stars);
+        let t = parse(&src).expect("long unary chain should parse (iterative prefixes)");
+        assert_eq!(t.unparse(), src);
+    }
+
+    /// B-5: measure child-fanout distribution (no SmallVec adoption without data).
+    #[test]
+    fn children_fanout_measurement() {
+        let src = "fn main() {
+  let mut x = 1;
+  let r = &mut x;
+  let y = x + 1;
+  while y < 10 { f(y); }
+  if y == 3 { f(x, &y); } else { g(); }
+}
+";
+        let t = parse(src).expect("parse");
+        let mut hist = [0u32; 17];
+        let mut max_c = 0usize;
+        let mut sum = 0usize;
+        let mut nodes = 0usize;
+        for n in &t.nodes {
+            let c = n.children.len();
+            max_c = max_c.max(c);
+            sum += c;
+            nodes += 1;
+            hist[c.min(16)] += 1;
+        }
+        let avg = sum as f64 / nodes as f64;
+        // Sanity: tree edges ≈ nodes-1 for a tree.
+        assert_eq!(sum + 1, nodes, "tree edge count");
+        // Record distribution for NOTES / future SmallVec decisions (printed on --nocapture).
+        eprintln!(
+            "children fanout: nodes={} avg={:.2} max={} hist0_16={:?}",
+            nodes,
+            avg,
+            max_c,
+            &hist[..]
+        );
+        // Typical CL0 ASTs: most nodes have a small fanout (leaves=0, exprs few).
+        assert!(avg < 4.0, "unexpectedly high average fanout {:.2}", avg);
     }
 }
