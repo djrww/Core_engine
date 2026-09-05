@@ -14,6 +14,10 @@ name = "cl0r0"
 path = "src/bin/cl0r0.rs"
 
 [[bin]]
+name = "dev_loop"
+path = "src/bin/dev_loop.rs"
+
+[[bin]]
 name = "l9newman"
 path = "src/bin/l9newman.rs"
 

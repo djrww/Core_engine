@@ -14,6 +14,7 @@ CL0/R₀ 雙載體的機械自証代碼庫：表面語法樹、18 大形式化�
 - 📈 **[海量測試數據與差分審核矩陣 (COVERAGE_REPORT.md)](COVERAGE_REPORT.md)**: 79,000 組極限壓測樣本 100% 自証通過與 99.02% 差分審核評分明細。
 - 🧬 **[巨集七原則佈署計畫 (MACRO_SEVEN_PRINCIPLES.md)](MACRO_SEVEN_PRINCIPLES.md)**: 借.md 七原則之 token-tree 模型、九系統規則樹、P1–P7 證據鏈與借用組合模型(B1–B6、3·o²·n²)落碼定案。
 - 📚 **[全功能圖鑑與證書冊 (FEATURE_ATLAS.md)](FEATURE_ATLAS.md)**: 64 項功能全景表(用途/內嵌機制/語法層/語義/覆蓋率)、15 項認證功能登記冊與八大功能歸類。
+- 🔁 **[開發閉環章程 (DEV_LOOP.md)](DEV_LOOP.md) × [看板 (BACKLOG.md)](BACKLOG.md)**: 循環七步、三隊分工、WIP≤2 硬規則;`cargo run --bin dev_loop` 為機核裁判(CI 強制)。
 
 ---
 
@@ -51,6 +52,9 @@ CL0/R₀ 雙載體的機械自証代碼庫：表面語法樹、18 大形式化�
 ## 快速運行指令
 
 ```sh
+# 0. 開發閉環看板檢查(裁判:WIP/證據/驗收門不變式)
+cargo run --bin dev_loop
+
 # 1. 格式化与 Clippy 零警告检查
 cargo fmt --all -- --check
 cargo clippy --all-targets --all-features -- -D warnings

@@ -61,8 +61,9 @@ jobs:
           path: lcov.info
           retention-days: 90
 
-      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / macro_lab / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify / creusot_verify / dev_prover)
+      - name: mechanical self-verification (dev_loop / verify_all / dd_verify / cl0r0 / macro_lab / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify / creusot_verify / dev_prover)
         run: |
+          cargo run --bin dev_loop
           cargo run --bin cl0r0
           cargo run --bin l9newman
           cargo run --bin dd_verify
@@ -108,7 +109,7 @@ jobs:
         run: |
           tag=${GITHUB_REF_NAME}
           tar czf "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
-            -C target/release cl0r0 l9newman dd_verify macro_lab verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify rocq_verify creusot_verify
+            -C target/release cl0r0 dev_loop l9newman dd_verify macro_lab verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify rocq_verify creusot_verify
 
       - name: create or update GitHub Release
         env:

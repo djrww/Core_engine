@@ -1,7 +1,7 @@
 # FEATURE_ATLAS — 全功能圖鑑與證書冊
 
 > **版本**: v0.2.0 · 2026-09-05
-> **範圍**: 48 個 lib 模組 + 16 個 bin = **64 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
+> **範圍**: 48 個 lib 模組 + 17 個 bin = **65 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
 > **覆蓋率口徑**: CI run `33961021652`(commit `959f715`)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 71.3%**(門檻 65%)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
 > **測試**: `cargo test --all-targets` = **123/123 通過**(lib 88 + bins/integration 35)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
@@ -65,7 +65,7 @@
 | 47 | `testkit.rs` | 共享測試見證夾具 | fixtures 單一真相(審計 D-01) | **測試基建** | 見證共用語義 | 100% |
 | 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 66.7% |
 
-### B. bin 執行程序(16)
+### B. bin 執行程序(17)
 
 | # | 功能(bin) | 可以做咩 | 內嵌左啲咩 | 語法層 | 語義係咩 | 覆蓋率 |
 |---|------|----------|------------|--------|----------|--------|
@@ -85,6 +85,7 @@
 | 62 | `pipeline_runner` | 五大組合合成驗證程序 | 流水線編排執行 | 工程層 | 組合驗證 | 0%* |
 | 63 | `dev_prover` | 開發階段引理取証+証物提取 | 証物打包、取証流水線 | 證明工程層 | 証物規範 | 0%* |
 | 64 | `lsp_server` | 獨立 LSP 服務二進制 | JSON-RPC 伺服循環 | 工程層 | LSP 服務語義 | 0%* |
+| 65 | `dev_loop` | 開發閉環看板機核裁判 | BACKLOG.md 解析 + 不變式檢查(WIP≤2/done 必有證據/proposed≤5) | 開發流程層(治理) | 閉環不變式語義;違規即非零退出 | 0%* |
 
 \* bin 0% = 量測空洞(llvm-cov 不計 CI 的 `cargo run` 執行);CI 每輪實跑全 16 bin 且全綠。
 
@@ -131,7 +132,7 @@
 | **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器 | lemmas(23)、cpf_cert(24)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(55)、bin creusot_verify(56)、bin cert_factory(57)、bin dev_prover(63) | 12 |
 | **六·實用載體與降階層** | R₀ 子集與語義降階 | r0(17)、r0_lower(18)、rustc_json(42) | 3 |
 | **七·演算法基建層** | 合一、共享、索引 | unification(32)、dag_term(33)、discrimination_tree(34) | 3 |
-| **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(49)、bin verify_all(50)、bin ci_verify(51)、bin coco_benchmark(58)、bin fuzz(59)、bin fuzz_daemon(60)、bin lemma_stress_coverage(61)、bin pipeline_runner(62)、bin lsp_server(64) | 22 |
+| **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(49)、bin verify_all(50)、bin ci_verify(51)、bin coco_benchmark(58)、bin fuzz(59)、bin fuzz_daemon(60)、bin lemma_stress_coverage(61)、bin pipeline_runner(62)、bin lsp_server(64)、bin dev_loop(65) | 23 |
 
 **分布**:語法/語義核心(類一、三、四)= 21 項 · 形式化背書(類五)= 12 項 · 品質工程(類八)= 22 項 ——「核心數學」與「驗證工程」雙軌並重。
 

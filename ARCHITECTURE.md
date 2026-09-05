@@ -175,6 +175,7 @@ sequenceDiagram
   - 提供標準 Model Context Protocol 工具（`verify_cl0_rules`, `check_creusot_contracts`, `export_rocq_theories`）。
   - 支持 AI Agent 進行多步自動化演繹證明與代碼合成。
 - **CI 自動化自証二進制**:
+  - `dev_loop`: 開發閉環看板機核裁判(BACKLOG.md 不變式:WIP≤2、done 必有證據、proposed≤5;違規即擋 CI)。
   - `ci_verify`: 7 大 CI 門禁自動化執行器。
   - `rocq_verify`: Rocq 9.2 理論合成與微內核獨立驗證。
   - `creusot_verify`: Creusot Pearlite 預言變量與 Why3 SMT 消解。

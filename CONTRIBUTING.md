@@ -92,6 +92,17 @@ cargo run --bin verify_all
 
 ---
 
+## 4b. 開發閉環(所有變更的必經流程)
+
+本專案以 **DEV_LOOP.md 章程** 管理一切開發:看板 `BACKLOG.md` 是單一真相,`cargo run --bin dev_loop` 是機核裁判(CI 強制)。
+
+1. **先上板**:任何變更先在 BACKLOG.md 登記(ID/隊/驗收門),口頭承諾不算數;
+2. **循環七步**:挑一件 → 樹/計畫定案 → 實作 → 全量門禁 → CI 綠 → 看板關門入冊 → commit 引用 DL 編號;
+3. **硬規則**:WIP(building+verifying)≤ 2;done 必有證據;proposed ≤ 5;五債清空前凍結新功能;
+4. **提交檢查清單**:fmt ✓ · clippy -D warnings 0 ✓ · test 全綠 ✓ · CI 全綠 ✓ · 看板已更新 ✓。
+
+詳見 [DEV_LOOP.md](DEV_LOOP.md)。
+
 ## 5. 差分反例提交規範 (Differential Bug Report Guidelines)
 
 若在實踐中發現形式化定理或解析器行為與預期不符，請按以下規範提交 Issue：
