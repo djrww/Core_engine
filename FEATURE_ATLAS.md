@@ -1,9 +1,9 @@
 # FEATURE_ATLAS — 全功能圖鑑與證書冊
 
 > **版本**: v0.2.0 · 2026-09-05
-> **範圍**: 48 個 lib 模組 + 17 個 bin = **65 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
-> **覆蓋率口徑**: CI run `33971501247`(commit `7772995`,DL-001 補測後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 75.4%**(門檻 72,DL-003 上調)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
-> **測試**: `cargo test --all-targets` = **165/165 通過**(lib 122 + bins/integration 43;DL-001 +34)。
+> **範圍**: 49 個 lib 模組 + 17 個 bin = **66 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
+> **覆蓋率口徑**: CI run `33997238431`(commit `a97178b`,DL-004/006 後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 78.5%**(門檻 72,下一級 80)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
+> **測試**: `cargo test --all-targets` = **169/169 通過**(lib 126 + bins/integration 43;DL-004 selfcheck +4)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
 
 ---
@@ -12,7 +12,7 @@
 
 欄位:**功能**(原始檔)/ **可以做咩**(用途)/ **內嵌左啲咩**(核心算法·資料結構·定理)/ **語法層**(lex → parse → AST/TT → MIR → 語義/證明 所處階層)/ **語義係咩**(數學語義·依據定理)/ **覆蓋率**。
 
-### A. lib 模組(48)
+### A. lib 模組(50)
 
 | # | 功能 | 可以做咩 | 內嵌左啲咩 | 語法層 | 語義係咩 | 覆蓋率 |
 |---|------|----------|------------|--------|----------|--------|
@@ -64,28 +64,29 @@
 | 46 | `cert_generator_factory.rs` | 污料宇宙+證書批量生產 | 污料生成、工廠產線、髒輸入穩健性核驗 | **測試/證書層** | 認證流水線語義 | 95.8% |
 | 47 | `testkit.rs` | 共享測試見證夾具 | fixtures 單一真相(審計 D-01) | **測試基建** | 見證共用語義 | 100% |
 | 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 66.7% |
+| 49 | `selfcheck.rs` | verify_all/ci_verify 門禁決策層(可單測) | GateStatus/GateOutcome 三態、GateLedger(strict 語義/退出碼)、17 個門禁「檢查+判定」函數 | **自証決策層**(消費各層產物) | F-01 三態誠實語義的單一真相 | 88.9% |
 
 ### B. bin 執行程序(17)
 
 | # | 功能(bin) | 可以做咩 | 內嵌左啲咩 | 語法層 | 語義係咩 | 覆蓋率 |
 |---|------|----------|------------|--------|----------|--------|
-| 49 | `cl0r0` | 主演示:九律檢查+幾何/重寫演示 | 九律檢查、幾何演示、R₀ 接線 | 全層演示 | 定律載體巡禮 | 0%* |
-| 50 | `verify_all` | 端到端全量自証(10 門禁) | GATES 常量驅動、三態(Proven/Skipped/Failed)、`--strict` 發布模式 | 全層 | 門禁語義:SKIPPED≠PASSED(F-01) | 0%* |
-| 51 | `ci_verify` | CI 專項 7 大門禁執行器 | 18 引理+壓測+合成+JSON+DAG+MIR+差分 七門禁串聯 | 全層 | CI 驗收閉環 | 0%* |
-| 52 | `macro_lab` | 巨集七原則+借用組合證據鏈(14 門禁) | P1–P7+B1–B6+Θ(n²) 實測;`--verbose` 逐規則傾印 | 巨集/借用層 | 證據鏈語義:14/14 PASS | 0%* |
-| 53 | `dd_verify` | 遞減圖+Newman 自証驅動 | 峰值會合演示、CPF-KB 短證出具 | 語義層 | DD+Newman 雙通道 | 0%* |
-| 54 | `l9newman`(bin) | Newman 快速通道獨立驅動 | SNWitness 出具、耗時計量 | 語義層 | SN∧WCR⇒CR | 0%* |
-| 55 | `rocq_verify` | Rocq 導出+微內核核檢主程序 | tool_runner 三態、rocqchk 呼叫 | 外部證明層 | 微內核複核 | 0%* |
-| 56 | `creusot_verify` | Creusot/Why3 SMT 消解主程序 | Pearlite 契約、Z3 消解 | 外部證明層 | VC 消解語義 | 0%* |
-| 57 | `cert_factory` | 污料宇宙+證書批量生產運行機 | 污料生成、認證產線 | 測試/證書層 | 批量認證 | 0%* |
-| 58 | `coco_benchmark` | 國際合流基準壓測(CoCo) | 基準套件執行、計分 | 語義/交換層 | 基準語義 | 0%* |
-| 59 | `fuzz` | 確定性種子屬性測試主程序 | 種子重現、屬性斷言 | 測試層 | 屬性測試語義 | 0%* |
-| 60 | `fuzz_daemon` | 4 小時輪自動 Fuzzing 守護進程 | 定時排程、日誌 | 測試層 | 守護進程語義 | 0%* |
-| 61 | `lemma_stress_coverage` | 79k 壓測+真實覆蓋率主程序 | 海量樣本、覆蓋率統計 | 測試層 | 壓測證書 | 0%* |
-| 62 | `pipeline_runner` | 五大組合合成驗證程序 | 流水線編排執行 | 工程層 | 組合驗證 | 0%* |
-| 63 | `dev_prover` | 開發階段引理取証+証物提取 | 証物打包、取証流水線 | 證明工程層 | 証物規範 | 0%* |
-| 64 | `lsp_server` | 獨立 LSP 服務二進制 | JSON-RPC 伺服循環 | 工程層 | LSP 服務語義 | 0%* |
-| 65 | `dev_loop` | 開發閉環看板機核裁判 | BACKLOG.md 解析 + 不變式檢查(WIP≤2/done 必有證據/proposed≤5) | 開發流程層(治理) | 閉環不變式語義;違規即非零退出 | 0%* |
+| 50 | `cl0r0` | 主演示:九律檢查+幾何/重寫演示 | 九律檢查、幾何演示、R₀ 接線 | 全層演示 | 定律載體巡禮 | 0%* |
+| 51 | `verify_all` | 端到端全量自証(10 門禁) | GATES 常量驅動、三態(Proven/Skipped/Failed)、`--strict` 發布模式 | 全層 | 門禁語義:SKIPPED≠PASSED(F-01) | 0%* |
+| 52 | `ci_verify` | CI 專項 7 大門禁執行器 | 18 引理+壓測+合成+JSON+DAG+MIR+差分 七門禁串聯 | 全層 | CI 驗收閉環 | 0%* |
+| 53 | `macro_lab` | 巨集七原則+借用組合證據鏈(14 門禁) | P1–P7+B1–B6+Θ(n²) 實測;`--verbose` 逐規則傾印 | 巨集/借用層 | 證據鏈語義:14/14 PASS | 0%* |
+| 54 | `dd_verify` | 遞減圖+Newman 自証驅動 | 峰值會合演示、CPF-KB 短證出具 | 語義層 | DD+Newman 雙通道 | 0%* |
+| 55 | `l9newman`(bin) | Newman 快速通道獨立驅動 | SNWitness 出具、耗時計量 | 語義層 | SN∧WCR⇒CR | 0%* |
+| 56 | `rocq_verify` | Rocq 導出+微內核核檢主程序 | tool_runner 三態、rocqchk 呼叫 | 外部證明層 | 微內核複核 | 0%* |
+| 57 | `creusot_verify` | Creusot/Why3 SMT 消解主程序 | Pearlite 契約、Z3 消解 | 外部證明層 | VC 消解語義 | 0%* |
+| 58 | `cert_factory` | 污料宇宙+證書批量生產運行機 | 污料生成、認證產線 | 測試/證書層 | 批量認證 | 0%* |
+| 59 | `coco_benchmark` | 國際合流基準壓測(CoCo) | 基準套件執行、計分 | 語義/交換層 | 基準語義 | 0%* |
+| 60 | `fuzz` | 確定性種子屬性測試主程序 | 種子重現、屬性斷言 | 測試層 | 屬性測試語義 | 0%* |
+| 61 | `fuzz_daemon` | 4 小時輪自動 Fuzzing 守護進程 | 定時排程、日誌 | 測試層 | 守護進程語義 | 0%* |
+| 62 | `lemma_stress_coverage` | 79k 壓測+真實覆蓋率主程序 | 海量樣本、覆蓋率統計 | 測試層 | 壓測證書 | 0%* |
+| 63 | `pipeline_runner` | 五大組合合成驗證程序 | 流水線編排執行 | 工程層 | 組合驗證 | 0%* |
+| 64 | `dev_prover` | 開發階段引理取証+証物提取 | 証物打包、取証流水線 | 證明工程層 | 証物規範 | 0%* |
+| 65 | `lsp_server` | 獨立 LSP 服務二進制 | JSON-RPC 伺服循環 | 工程層 | LSP 服務語義 | 0%* |
+| 66 | `dev_loop` | 開發閉環看板機核裁判 | BACKLOG.md 解析 + 不變式檢查(WIP≤2/done 必有證據/proposed≤5) | 開發流程層(治理) | 閉環不變式語義;違規即非零退出 | 0%* |
 
 \* bin 0% = 量測空洞(llvm-cov 不計 CI 的 `cargo run` 執行);CI 每輪實跑全 16 bin 且全綠。
 
@@ -102,7 +103,7 @@
 | 3 | `dd_checker` | 遞減圖會合證書 + CPF-KB 短證 | 機內 | 60 狀態/26 峰值收斂唯一正規形;短證 318µs | ✅ CI Gate 3+4 |
 | 4 | `diff_tree`(L18) | 結構共享率見證證書 | 機內實測 | 共享率 95.08%(標桿 ≥92%)+ 逐位元組等價 | ✅ CI Gate 1+2 |
 | 5 | `reparse_verifier` | 增量重析等價證書 | 機內 | 1000 樣本 100% 逐字節吻合 | ✅ CI Gate 1 |
-| 6 | `rocq_export` | `.vo` + **rocqchk 微內核**核檢證書 | 外部(Rocq 9.2) | rocqchk 獨立複核 KernelCheck | ⏸ SKIPPED(本機/CI 無 rocq,如實申報;裝機即 Proven) |
+| 6 | `rocq_export` | `.vo` + **rocqchk 微內核**核檢證書 | 外部(Rocq 9.2) | rocqchk 獨立複核 KernelCheck | ✅ CI Proven(DL-005:opam rocq-core 9.2.0 + rocqchk「Modules were successfully checked」,run 33996272152 起) |
 | 7 | `creusot_export` | Why3+Z3 SMT 消解證書 | 外部(Why3+Z3) | SMT goals 100% Valid(預言變量契約) | ✅ CI Gate 9 Proven(CI 已裝 why3+z3) |
 | 8 | `isabelle_export` | Isabelle/HOL 理論草稿(CeTA/CPF XML 可核驗形態) | 外部(Isabelle/CeTA 消費) | 導出態:理論草稿+CPF XML | 📤 導出就緒(待 CeTA 環境) |
 | 9 | `ari_export` | CoCo 2025/2026 **ARI/COPS 交換格式**證書 | 交換標準符合 | ARI 規範編碼 100% 標準形 | ✅ CI(coco_benchmark) |
@@ -111,7 +112,7 @@
 | 12 | `differential_checker` | 差分審核評分證書 | 機內+黃金標準對賬 | 差分審核矩陣 99.02% 評分 | ✅ CI |
 | 13 | `macro_lab`(P1–P7) | 七原則證據鏈證書 | 機內(模型↔真巨集雙通道) | 14/14 門禁 PASS;μ 遞減;Θ(n²) 比例 3.45 | ✅ CI Gate 10 |
 | 14 | `borrow_model`(B1–B6) | 借用組合六門禁證書 | 機內(naive≡sweep≡Datalog 三算法差分+rep_dd 交叉驗證) | 24 組種子等價;κ-矩陣 3 格;層狀 depth×n | ✅ CI Gate 10 |
-| 15 | `verify_all` / `ci_verify` | 端到端門禁總證書(10+7 門禁) | 機內+外部混合 | 8/10 Proven+2 SKIPPED(如實);ci_verify 7/7 | ✅ CI 綠 |
+| 15 | `verify_all` / `ci_verify` | 端到端門禁總證書(10+7 門禁) | 機內+外部混合 | **10/10 Proven · 0 SKIPPED**(CI);ci_verify 7/7 | ✅ CI 綠 |
 
 ### 登記冊附註(冊法)
 
@@ -126,13 +127,13 @@
 | 類別 | 職責 | 功能(表1 #) | 小計 |
 |------|------|--------------|------|
 | **一·詞法與語法層**(載體前置) | 字節流→token→樹,無損與增量 | lex(1)、parse(2)、span(3)、edit(4)、span_monad(5)、ast(6)、diff_tree(7)、tree(8) | 8 |
-| **二·巨集層**(語法擴展) | 巨集語義之可執行模型與真巨集 | token_tree(9)、macro_lab(10)、bin macro_lab(52) | 3 |
+| **二·巨集層**(語法擴展) | 巨集語義之可執行模型與真巨集 | token_tree(9)、macro_lab(10)、bin macro_lab(53) | 3 |
 | **三·借用與類型語義層** | 借用組合、契約、變異性 | borrow_model(11)、mir(19)、modular_contracts(20)、variance_dropck_ub(21)、polonius_bridge(22) | 5 |
-| **四·重寫與合流層**(語義核心) | 終止、合流、正規形 | rep(12)、rep_dd(13)、dd_checker(14)、rule_labeling(15)、l9newman(16)、bin dd_verify(53)、bin l9newman(54)、maude_engine(35) | 8 |
-| **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器 | lemmas(23)、cpf_cert(24)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(55)、bin creusot_verify(56)、bin cert_factory(57)、bin dev_prover(63) | 12 |
+| **四·重寫與合流層**(語義核心) | 終止、合流、正規形 | rep(12)、rep_dd(13)、dd_checker(14)、rule_labeling(15)、l9newman(16)、bin dd_verify(54)、bin l9newman(55)、maude_engine(35) | 8 |
+| **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器 | lemmas(23)、cpf_cert(24)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(56)、bin creusot_verify(57)、bin cert_factory(58)、bin dev_prover(64) | 12 |
 | **六·實用載體與降階層** | R₀ 子集與語義降階 | r0(17)、r0_lower(18)、rustc_json(42) | 3 |
 | **七·演算法基建層** | 合一、共享、索引 | unification(32)、dag_term(33)、discrimination_tree(34) | 3 |
-| **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(49)、bin verify_all(50)、bin ci_verify(51)、bin coco_benchmark(58)、bin fuzz(59)、bin fuzz_daemon(60)、bin lemma_stress_coverage(61)、bin pipeline_runner(62)、bin lsp_server(64)、bin dev_loop(65) | 23 |
+| **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(50)、bin verify_all(51)、bin ci_verify(52)、bin coco_benchmark(59)、bin fuzz(60)、bin fuzz_daemon(61)、bin lemma_stress_coverage(62)、bin pipeline_runner(63)、bin lsp_server(65)、bin dev_loop(66)、selfcheck(49) | 24 |
 
 **分布**:語法/語義核心(類一、三、四)= 21 項 · 形式化背書(類五)= 12 項 · 品質工程(類八)= 22 項 ——「核心數學」與「驗證工程」雙軌並重。
 
@@ -155,8 +156,8 @@
 | # | 債項 | 風險 | 建議 |
 |---|------|------|------|
 | D-1 | ~~覆蓋率冷點~~ | **已清(DL-001)**:五檔 91–98%,+34 測試;並修得兩處潛伏 bug(extract 作用域彈空 ⇒ 0 事件;借鏈不 walk ⇒ &mut 事件缺席) | — |
-| D-2 | 16 個 bin 於 llvm-cov 顯示 0%(量測空洞) | bin 內邏輯無單測保護 | 將 bin 主體邏輯下沉為 lib 函數;或 `cargo llvm-cov --run-bin` |
+| D-2 | bin 下沉重構 | **第一批已清(DL-004)**:verify_all −72%/ci_verify −77% 決策層入 `selfcheck`(88.9% 覆蓋) | 其餘 14 個 bin 可續批 |
 | D-3 | 裸 unwrap 訊息化 | **第一批已清(DL-002)**:ari_export(11)+maude_engine(10)→ 0;餘量(lex 1、parse 6 等)留待第二批 | 後續批次:parse/ast/polonius_bridge/lemmas |
 | D-4 | 覆蓋率門檻階梯 | **65→72 已清(DL-003,CI 實測 75.4%)**;下一級 80 | DL-004 下沉後再攻 80 |
 | D-5 | `$k:path` 片段不可作巨集呼叫名(Rust 語言限制) | cl0_produce 需 `$k:ident` + 呼叫端解析 | 已定案 ident 方案;如需 path 級別,改 `macro_rules` 內 `use` 絕對路徑再呼叫 |
-| D-6 | Rocq 9.2 不在 CI 環境(Gate 8 永遠 SKIPPED) | 形式化背書鏈缺一角 | CI 加 `rocq-overlay` 或容器側裝 Rocq;或標記 release 前置檢查清單 |
+| D-6 | ~~CI 缺 Rocq~~ | **已清(DL-005)**:opam rocq-core 9.2.0;CI 10/10+7/7 零 SKIPPED | — |
