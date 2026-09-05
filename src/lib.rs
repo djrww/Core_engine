@@ -37,6 +37,7 @@
 
 pub mod ari_export;
 pub mod ast;
+pub mod borrow_model;
 pub mod cert_generator_factory;
 pub mod cpf_cert;
 pub mod creusot_export;
@@ -54,6 +55,7 @@ pub mod lemma_stress_generator;
 pub mod lemmas;
 pub mod lex;
 pub mod lsp_bridge;
+pub mod macro_lab;
 pub mod maude_engine;
 pub mod mir;
 pub mod modular_contracts;
@@ -76,6 +78,7 @@ pub mod span_monad;
 pub mod tactic_scheduler;
 pub mod tactics;
 pub mod testkit;
+pub mod token_tree;
 pub mod tool_runner;
 pub mod tree;
 pub mod unification;

@@ -12,6 +12,7 @@ CL0/R₀ 雙載體的機械自証代碼庫：表面語法樹、18 大形式化�
 - 🛡️ **[唯讀核心專案貢獻指南 (CONTRIBUTING.md)](CONTRIBUTING.md)**: 宣告不可變核心專案政策、7 大 CI 驗收門禁、Rocq 9.2 / Creusot 驗證標準與 DDMin 差分反例提交規範。
 - 📊 **[18 大形式化引理與自証報告 (DEVELOPMENT_PLAN.md)](DEVELOPMENT_PLAN.md)**: 18 大強類型引理矩陣、MIR 降階、OOPSLA 2025 模組化契約與 CI 門禁證明。
 - 📈 **[海量測試數據與差分審核矩陣 (COVERAGE_REPORT.md)](COVERAGE_REPORT.md)**: 79,000 組極限壓測樣本 100% 自証通過與 99.02% 差分審核評分明細。
+- 🧬 **[巨集七原則佈署計畫 (MACRO_SEVEN_PRINCIPLES.md)](MACRO_SEVEN_PRINCIPLES.md)**: 借.md 七原則之 token-tree 模型、九系統規則樹、P1–P7 證據鏈與借用組合模型(B1–B6、3·o²·n²)落碼定案。
 
 ---
 
@@ -32,7 +33,12 @@ CL0/R₀ 雙載體的機械自証代碼庫：表面語法樹、18 大形式化�
 4. **持久化結構共享 AST (Persistent Structural Sharing)**:
    - 基於 `Arc<DiffAstNode>` 的不可變節點共享，文本突變時僅重構變更脊椎，非相交子樹 0 拷貝重用，實測共享率 **95.08%**（超越 $\ge 92.0\%$ 指標）。
 
-5. **五大天然組合深度合成系統 (5-Cluster Unified Pipeline)**:
+5. **巨集七原則 × 借用組合模型 (Macro Lab & Borrow Model)**:
+   - **token_tree / macro_lab**: 附件七原則的可執行模型——tt-muncher 語義(展開鏈 `expand_chain`、μ 嚴格遞減終止證據)、九系統規則樹 registry(模型↔真巨集同構登記)、P1–P7 七門禁(互斥、同構、終止、CPS、hygiene、let sharing、Tree 代換)與 `cl0_safe_vec!` 等 10 個真巨集對照。
+   - **borrow_model**: κ-矩陣(4 格恰 3 衝突格)、naive O(n²) = sweep O(n log n) = MiniDatalog(借.md §2 三規則逐字)三算法差分等價、層狀(laminar)族 depth×n 優勢、3·o²·n² 搜尋空間會計,以及與 `rep_dd.red_edges` 的雙通道交叉驗證(B1–B6 門禁)。
+   - 佈署計畫見 `MACRO_SEVEN_PRINCIPLES.md`(先規劃樹、後寫碼紀律)。
+
+6. **五大天然組合深度合成系統 (5-Cluster Unified Pipeline)**:
    - **組合 1【語義幾何與重寫規範化】**: `ast` + `rep_dd` + `tree` + `r0_lower`
    - **組合 2【合流證明與形式化證書工廠】**: `dd_checker` + `tactic_scheduler` + `cpf_cert` + `ari_export` + `rocq_export` + `creusot_export`
    - **組合 3【全化語法解析與雙向編譯器事實橋】**: `parse` + `lex` + `r0` + `polonius_bridge`
@@ -48,7 +54,7 @@ CL0/R₀ 雙載體的機械自証代碼庫：表面語法樹、18 大形式化�
 cargo fmt --all -- --check
 cargo clippy --all-targets --all-features -- -D warnings
 
-# 2. 全量测试套件 (96 项测试 100% 通过;以 `cargo test --all-targets` 實測數為準)
+# 2. 全量测试套件 (123 项测试 100% 通过;以 `cargo test --all-targets` 實測數為準)
 cargo test --all-targets
 
 # 3. 运行 CI 全量 7 大机械自证门禁
@@ -63,7 +69,12 @@ cargo run --bin creusot_verify
 # 6. 运行 79,000+ 组引理海量数据极限压测 (0 Panic)
 cargo run --release --bin lemma_stress_coverage
 
-# 7. 运行九项端到端机核检门禁 (rocq/why3/z3 缺席时如实报告 SKIPPED)
+# 6b. 运行巨集七原则 P1–P7 + 借用组合 B1–B6 + Θ(n²) 复杂度证据链
+cargo run --bin macro_lab
+#    (verbose 模式输出每条规则树与门禁证据)
+cargo run --bin macro_lab -- --verbose
+
+# 7. 运行十项端到端机核检门禁 (rocq/why3/z3 缺席时如实报告 SKIPPED)
 cargo run --bin verify_all
 # 7b. 严格发布模式:任一 SKIPPED 即非零退出 (发布前必须在配备 Rocq/Why3/Z3 的环境通过)
 cargo run --bin verify_all -- --strict

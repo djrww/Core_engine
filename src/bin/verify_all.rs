@@ -33,7 +33,7 @@ enum GateStatus {
 }
 
 /// 門禁註冊表(F-06:橫幅、編號、結論行全部由此常量驅動)
-const GATES: [&str; 9] = [
+const GATES: [&str; 10] = [
     "L1/L2/L5 語法層基礎檢查",
     "L3/L4 增量重析等價性",
     "L8/L9 遞減圖局部峰值會合",
@@ -43,6 +43,7 @@ const GATES: [&str; 9] = [
     "18 大形式化引理矩陣",
     "Rocq 9.2 形式化理論 + rocqchk 微內核核檢",
     "Creusot/Why3 Z3 SMT 演繹核驗",
+    "巨集七原則 P1–P7 + 借用組合 B1–B6 + Θ(n²) 實測",
 ];
 
 fn strict_mode() -> bool {
@@ -371,6 +372,36 @@ fn main() {
             println!("FAILED ({})", creusot_note);
             failed += 1;
         }
+    }
+
+    // ------------------------------------------------------------------
+    // [Gate 10/10] 巨集七原則 + 借用組合模型(純機內,永不 SKIPPED)
+    // ------------------------------------------------------------------
+    print!(
+        "[Gate 10/{}] 正在校驗巨集七原則 P1–P7、借用組合 B1–B6 與 Θ(n²) 複雜度... ",
+        GATES.len()
+    );
+    let mut macro_bad: Vec<String> = Vec::new();
+    for r in cl0r0::macro_lab::verify_seven_principles() {
+        if !r.passed {
+            macro_bad.push(format!("{}:{}", r.id, r.evidence));
+        }
+    }
+    for r in cl0r0::borrow_model::verify_borrow_model() {
+        if !r.passed {
+            macro_bad.push(format!("{}:{}", r.id, r.evidence));
+        }
+    }
+    let (cx_ok, cx_ev) = cl0r0::macro_lab::complexity_report();
+    if !cx_ok {
+        macro_bad.push(format!("CX:{}", cx_ev));
+    }
+    if macro_bad.is_empty() {
+        println!("PASSED (P1–P7 七門禁 + B1–B6 借用組合門禁 + {})", cx_ev);
+        proven += 1;
+    } else {
+        println!("FAILED ({} 項未過:{:?})", macro_bad.len(), macro_bad);
+        failed += 1;
     }
 
     // ------------------------------------------------------------------

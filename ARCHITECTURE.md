@@ -178,7 +178,8 @@ sequenceDiagram
   - `ci_verify`: 7 大 CI 門禁自動化執行器。
   - `rocq_verify`: Rocq 9.2 理論合成與微內核獨立驗證。
   - `creusot_verify`: Creusot Pearlite 預言變量與 Why3 SMT 消解。
-  - `verify_all`: 九項端到端機核檢門(rocq/why3/z3 缺席時如實報 SKIPPED;`--strict` 模式下 SKIPPED 即非零退出)。
+  - `verify_all`: 十項端到端機核檢門(rocq/why3/z3 缺席時如實報 SKIPPED;`--strict` 模式下 SKIPPED 即非零退出)。
+  - `macro_lab`: 巨集七原則 P1–P7 + 借用組合 B1–B6 + Θ(n²) 複雜度實測證據鏈(14 門禁,純機內永不 SKIPPED)。
   - `lemma_stress_coverage`: 79,000+ 樣本極限海量壓測。
 
 ### 3.2 第二層 (Layer 2: Core Processing & Dual Carrier Engine)
@@ -186,6 +187,10 @@ sequenceDiagram
    - `lex`, `parse`: 100% 平鋪詞法與全化 DFA 解析，面對任意破損二進制流保證 0-Panic。
    - `diff_tree`: 持久化結構共享 AST（`Arc<DiffAstNode>`），突變時僅重構脊椎節點，實測共享率 **95.08%**（超過 92% 標桿）。
    - `span_monad`, `edit`: 跨度單子與編輯 Monoid 結合律，保證事實層與 AST 雙向逆同態映射。
+1b. **巨集與借用組合模型層**:
+   - `token_tree`: TokenTree(`TT::Atom/Group`)解析與渲染、片段判別子(`Frag::Expr/Ident/Tt`)與 match_seq 模式匹配器(Rep 貪婪+回退、telemetry 比較計數)。
+   - `macro_lab`: 附件七原則可執行模型——tt-muncher 展開鏈(`expand_chain`、委派語義、μ 嚴格遞減)、九系統規則樹 registry、P1–P7 七門禁、`cl0_safe_vec!`/`cl0_with_val!`/`cl0_laminar_scope!` 等真巨集對照。
+   - `borrow_model`: κ-矩陣 3 衝突格、naive/sweep/laminar 三算法 + MiniDatalog(§2 三規則逐字)定點求解、3·o²·n² 搜尋空間會計、rep_dd 紅邊交叉驗證(B1–B6 門禁)。
 2. **MIR 靜態分析與契約層**:
    - `mir`: 控制流圖 (CFG)、Place 投影解析、Move Analysis 數據流求解與宣告反序 Drop 展開。
    - `modular_contracts`: OOPSLA 2025 模組化借用契約、Reborrow 懸掛/重活化棧與循環不動點求解器。

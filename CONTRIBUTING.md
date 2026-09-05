@@ -83,7 +83,10 @@ cargo run --bin creusot_verify
 # 6. 執行 79,000 組引理極限壓測
 cargo run --release --bin lemma_stress_coverage
 
-# 7. 執行九項端到端機核檢門禁(外部證明器缺席時如實報 SKIPPED)
+# 6b. 執行巨集七原則與借用組合模型證據鏈(14 門禁,純機內)
+cargo run --bin macro_lab
+
+# 7. 執行十項端到端機核檢門禁(外部證明器缺席時如實報 SKIPPED)
 cargo run --bin verify_all
 ```
 
