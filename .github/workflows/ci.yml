@@ -26,6 +26,15 @@ jobs:
           sudo apt-get install -y why3 z3
           why3 config detect || true
 
+      # DL-005:消滅 Gate 8 SKIPPED — 以 opam 安裝 Rocq(rocq + rocqchk 二進位;
+      # rocq-stdlib 提供prelude)。setup-ocaml 自帶 ~/.opam 快取,後續輪次秒級恢復。
+      - name: install Rocq 9.2 via opam (cached)
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.2.0"
+      - name: install rocq-core + rocq-stdlib
+        run: opam install -y rocq-core rocq-stdlib
+
       - name: install rust 1.98.0 + clippy + rustfmt + rust-analyzer
         uses: dtolnay/rust-toolchain@1.98.0
         with:
@@ -63,6 +72,7 @@ jobs:
 
       - name: mechanical self-verification (dev_loop / verify_all / dd_verify / cl0r0 / macro_lab / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify / creusot_verify / dev_prover)
         run: |
+          eval $(opam env)
           cargo run --bin dev_loop
           cargo run --bin cl0r0
           cargo run --bin l9newman

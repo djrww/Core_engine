@@ -9,8 +9,8 @@
 | DL-001 | 覆蓋率冷點補測(圖鑑 D-1):ast.rs 41.2%、tactic_scheduler.rs 41.5%、l9newman.rs 53.6%、rustc_json.rs 58.0%、rep.rs 62.2% 五檔拉至各 ≥55%;允許拆兩片執行(片1=ast+tactic_scheduler、片2=其餘三檔) | 品質基建 | done | M | llvm-cov 逐檔 ≥55% 且全庫不低於 71.3%;cargo test 全綠;clippy 0 | 本地 llvm-cov:ast 91.2%/ts 98.0%/l9 95.8%/rj 95.7%/rep 97.7%,lib 總 75.7%;165 測試綠;**並修得兩處潛伏 bug**(extract 作用域棧彈空 ⇒ 0 事件;借鏈分支不 walk ⇒ &mut 事件缺席) |
 | DL-002 | unwrap 訊息化第一批(圖鑑 D-3):ari_export.rs(11 處)、maude_engine.rs(10 處)裸 unwrap 改 expect 帶「不變式:…」訊息 | 品質基建 | done | S | 兩檔 0 裸 unwrap(grep 見證);fmt/clippy/test 全綠 | grep -c unwrap() 兩檔皆 0(21 處 → expect 帶「不變式」訊息);165 測試綠 |
 | DL-003 | 覆蓋率門檻上調 65 → 72(圖鑑 D-4;依賴 DL-001 完成後方可執行) | 品質基建 | done | S | ci.yml --fail-under-lines 72;CI 全綠 | ci.yml 門檻 65→72;CI run 33971501247 全綠,workspace 實測 75.4%(9518/12630)> 72 |
-| DL-004 | bin 主體邏輯下沉 lib 第一批(圖鑑 D-2):verify_all(277 行)與 ci_verify(260 行)決策層抽為 lib 可測函數 | 品質基建 | proposed | M | 下沉函數有單測;兩 bin 行數各 −30%;全量門禁綠 | — |
-| DL-005 | CI 裝 Rocq 9.2 消滅 Gate 8 SKIPPED(圖鑑 D-6;若 CI 環境不可行,出 ADR 記錄替代路線) | 證明證書 | proposed | M | CI Gate 8 = Proven;或 ADR-009 替代方案獲產品負責人驗收 | — |
+| DL-004 | bin 主體邏輯下沉 lib 第一批(圖鑑 D-2):verify_all(277 行)與 ci_verify(260 行)決策層抽為 lib 可測函數 | 品質基建 | building | M | 下沉函數有單測;兩 bin 行數各 −30%;全量門禁綠 | selfcheck.rs 671 行(決策層+Ledger+17 門禁函數+4 單測);verify_all 438→122(−72%);ci_verify 396→90(−77%);169 測試綠 |
+| DL-005 | CI 裝 Rocq 9.2 消滅 Gate 8 SKIPPED(圖鑑 D-6;若 CI 環境不可行,出 ADR 記錄替代路線) | 證明證書 | building | M | CI Gate 8 = Proven;或 ADR-009 替代方案獲產品負責人驗收 | ci.yml 加 ocaml/setup-ocaml@v3(opam 快取)+ rocq-core/rocq-stdlib;自証步驟 eval $(opam env);CI 綠後補 run id |
 
 ## 凍結規則(章程 §4)
 

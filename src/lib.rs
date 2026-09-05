@@ -72,6 +72,7 @@ pub mod reparse_verifier;
 pub mod rocq_export;
 pub mod rule_labeling;
 pub mod rustc_json;
+pub mod selfcheck;
 pub mod shrink;
 pub mod span;
 pub mod span_monad;
