@@ -124,3 +124,61 @@ impl TacticScheduler {
         )
     }
 }
+
+// ===========================================================================
+// 測試(圖鑑 D-1 / DL-001:tactic_scheduler.rs 冷點補測)
+// ===========================================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testkit::fixtures;
+
+    #[test]
+    fn newman_fast_path_selected_with_sn_witness() {
+        // 與 verify_all Gate 6 同配置:sample_states + LivenessScopeBounded ⇒ 必走快速通道
+        let states = fixtures::sample_states();
+        let witness = SNWitness::LivenessScopeBounded {
+            max_span_len: 4,
+            storages: 1,
+        };
+        let res = TacticScheduler::schedule_and_verify(&states, Some(witness), 6);
+        assert_eq!(res.selected_tactic, Tactic::NewmanFastPath);
+        assert!(res.report.certified, "Newman 模式應出具證書級報告");
+        assert!(!res.certificate.system_id.is_empty());
+        assert!(res.duration_micros < 5_000_000, "計時應是微秒量級");
+    }
+
+    #[test]
+    fn empty_states_fall_to_orthogonality() {
+        // 空狀態集:all() 空真 ⇒ 正交分支(零峰值 ⇒ Rosen 正交申報)
+        let res = TacticScheduler::schedule_and_verify(&[], None, 6);
+        assert_eq!(res.selected_tactic, Tactic::Orthogonality);
+        assert!(res.report.certified);
+        assert!(matches!(
+            res.certificate.proof_type,
+            crate::cpf_cert::ProofType::OrthogonalLeftLinear
+        ));
+    }
+
+    #[test]
+    fn dd_fallback_without_witness_on_conflicting_states() {
+        // 無 SN 見證 + 存在多規則狀態(重疊 mut/sh 對)⇒ 兜底 DecreasingDiagrams
+        let states = vec![fixtures::overlapping_pair()];
+        let res = TacticScheduler::schedule_and_verify(&states, None, 6);
+        assert_eq!(res.selected_tactic, Tactic::DecreasingDiagrams);
+        assert_eq!(res.certificate.system_id, "CL0-DD-General");
+        assert!(matches!(
+            res.certificate.proof_type,
+            crate::cpf_cert::ProofType::DecreasingDiagrams { .. }
+        ));
+    }
+
+    #[test]
+    fn cops_export_format() {
+        let s = TacticScheduler::export_cops_problem(42, 7);
+        assert!(s.contains("(format trs)"), "COPS TRS 格式頭:\n{}", s);
+        assert!(s.contains("COPS Problem #0042"));
+        assert!(s.contains("States: 7"));
+        assert!(s.contains("(rule (pair"));
+    }
+}

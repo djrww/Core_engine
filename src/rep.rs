@@ -432,3 +432,154 @@ pub fn enumerate_states(n_events: usize, max_coord: u32) -> Vec<AState> {
         })
         .collect()
 }
+
+// ===========================================================================
+// 測試(圖鑑 D-1 / DL-001:rep.rs 冷點補測)
+// ===========================================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ev(id: u32, storage: u32, kind: K, s: u32, e: u32) -> Ev {
+        Ev {
+            id,
+            storage,
+            kind,
+            it: Interval { start: s, end: e },
+        }
+    }
+
+    #[test]
+    fn labels_are_nonempty() {
+        assert_eq!(K::Mut.label(), "mut");
+        assert_eq!(K::Sh.label(), "sh");
+        assert!(Menu::CommutativeTrim.label().contains("CommutativeTrim"));
+        assert!(Menu::Naive.label().contains("Naive"));
+        assert!(Rule::R3Swap(0, 1).label().contains("swap"));
+    }
+
+    #[test]
+    fn new_autofills_missing_ids() {
+        let s = AState::new(vec![
+            ev(u32::MAX, 0, K::Mut, 0, 3),
+            ev(u32::MAX, 0, K::Sh, 1, 4),
+        ]);
+        assert_eq!(s.evs[0].id, 0);
+        assert_eq!(s.evs[1].id, 1);
+    }
+
+    #[test]
+    fn canon_key_is_order_insensitive_single_truth() {
+        let a = AState::new(vec![ev(0, 0, K::Mut, 0, 3), ev(1, 0, K::Sh, 1, 4)]);
+        let b = AState::new(vec![ev(1, 0, K::Sh, 1, 4), ev(0, 0, K::Mut, 0, 3)]);
+        assert_eq!(a.canon_key(), b.canon_key(), "事件次序無關(D-04 單一真相)");
+        assert!(a.canon_key().windows(2).all(|w| w[0] <= w[1]), "鍵有序");
+    }
+
+    #[test]
+    fn pair_conflict_matrix() {
+        assert!(AState::pair_conflicts(K::Mut, K::Mut));
+        assert!(AState::pair_conflicts(K::Mut, K::Sh));
+        assert!(AState::pair_conflicts(K::Sh, K::Mut));
+        assert!(!AState::pair_conflicts(K::Sh, K::Sh));
+    }
+
+    #[test]
+    fn red_edges_storage_interval_runtime_semantics() {
+        // 同 storage 重疊 mut-sh ⇒ 一條紅邊
+        let s = AState::new(vec![ev(0, 0, K::Mut, 0, 3), ev(1, 0, K::Sh, 1, 4)]);
+        assert_eq!(s.red_edges(), vec![(0, 1)]);
+        // 不同 storage ⇒ 無衝突
+        let apart = AState::new(vec![ev(0, 0, K::Mut, 0, 3), ev(1, 1, K::Sh, 1, 4)]);
+        assert!(apart.red_edges().is_empty());
+        // sh-sh 同 storage 重疊 ⇒ 合法
+        let calm = AState::new(vec![ev(0, 0, K::Sh, 0, 3), ev(1, 0, K::Sh, 1, 4)]);
+        assert!(calm.red_edges().is_empty());
+        // runtime 標記把紅邊移出 E_red
+        let mut rt = AState::new(vec![ev(0, 0, K::Mut, 0, 3), ev(1, 0, K::Sh, 1, 4)]);
+        rt.runtime.push((0, 1));
+        assert!(rt.red_edges().is_empty(), "runtime 借用豁免");
+    }
+
+    #[test]
+    fn measure_and_strict_decrease_lexicographic() {
+        let s = AState::new(vec![ev(0, 0, K::Mut, 0, 3), ev(1, 0, K::Sh, 1, 4)]);
+        assert_eq!(s.measure(), (1, 0));
+        // 語義:strictly_decreases(a, b) ≡ a 字典序小於 b(測度降到 b)
+        assert!(AState::strictly_decreases((1, 5), (2, 0)), "首元小即可");
+        assert!(
+            AState::strictly_decreases((1, 2), (1, 3)),
+            "首元等 ⇒ 次元小"
+        );
+        assert!(!AState::strictly_decreases((1, 0), (1, 0)), "相等非嚴格");
+        assert!(!AState::strictly_decreases((2, 0), (1, 5)));
+    }
+
+    #[test]
+    fn applicable_rules_menu_shapes() {
+        let s = AState::new(vec![ev(0, 0, K::Mut, 0, 3), ev(1, 0, K::Sh, 1, 4)]);
+        let trim = Menu::CommutativeTrim.applicable(&s, Policy::Guarded);
+        assert!(!trim.is_empty());
+        assert!(
+            trim.iter().all(|r| matches!(r, Rule::R1Shorten(_, _))),
+            "封閉菜單只含 R1"
+        );
+        // Naive:單事件 [0,3):R1 cut∈{1,2} + R2 split∈{1,2} = 4 條
+        let solo = AState::new(vec![ev(0, 0, K::Mut, 0, 3)]);
+        let naive = Menu::Naive.applicable(&solo, Policy::Raw);
+        assert_eq!(naive.len(), 4, "R1×2 + R2×2");
+    }
+
+    #[test]
+    fn apply_guarded_rejects_and_naive_rules_execute() {
+        // R1 邊界:cut 必須嚴格在區間內
+        let s = AState::new(vec![ev(0, 0, K::Mut, 0, 3)]);
+        assert!(apply(&s, Rule::R1Shorten(0, 0)).is_none());
+        assert!(apply(&s, Rule::R1Shorten(0, 3)).is_none());
+        let cut = apply(&s, Rule::R1Shorten(0, 2)).unwrap();
+        assert_eq!(cut.evs[0].it.end, 2);
+        assert!(!cut.log.is_empty(), "操作日誌記錄");
+        // 未知 id ⇒ None
+        assert!(apply(&s, Rule::R1Shorten(9, 1)).is_none());
+        // R2 split:storage 1 出現
+        let two = AState::new(vec![ev(0, 0, K::Mut, 0, 4), ev(1, 0, K::Sh, 2, 4)]);
+        let split = apply(&two, Rule::R2Split(0, 2)).unwrap();
+        assert!(
+            split.evs.iter().any(|e| e.storage == 1),
+            "切點後遷往新 storage"
+        );
+        // R3 swap 交換區間;同 id ⇒ None
+        let swapped = apply(&two, Rule::R3Swap(0, 1)).unwrap();
+        assert_eq!(swapped.evs[0].it, two.evs[1].it);
+        assert!(apply(&two, Rule::R3Swap(0, 0)).is_none());
+        // R4 runtime:非紅邊 ⇒ None;真紅邊 ⇒ 標記成功
+        assert!(apply(&two, Rule::R4Runtime(0, 0)).is_none() || two.red_edges().contains(&(0, 0)));
+        let rt = apply(&two, Rule::R4Runtime(0, 1)).unwrap();
+        assert!(rt.runtime.contains(&(0, 1)));
+        assert!(rt.red_edges().is_empty());
+    }
+
+    #[test]
+    fn normalize_reaches_conflict_free_normal_form() {
+        let s = AState::new(vec![ev(0, 0, K::Mut, 0, 4), ev(1, 0, K::Sh, 2, 4)]);
+        let (nf, steps) = normalize(s, Menu::CommutativeTrim, Policy::Guarded);
+        assert!(nf.red_edges().is_empty(), "正規形紅邊清零");
+        assert!(nf.is_normal_form());
+        assert!(steps > 0 && steps < 32, "步數有界");
+        // 已是正規形 ⇒ 0 步
+        let calm = AState::new(vec![ev(0, 0, K::Sh, 0, 2), ev(1, 0, K::Sh, 3, 5)]);
+        let (same, zero) = normalize(calm.clone(), Menu::CommutativeTrim, Policy::Guarded);
+        assert_eq!(zero, 0);
+        assert_eq!(same.canon_key(), calm.canon_key());
+    }
+
+    #[test]
+    fn step_takes_first_rule_or_reports_normal_form() {
+        let calm = AState::new(vec![ev(0, 0, K::Sh, 0, 2)]);
+        assert!(step(&calm, Menu::CommutativeTrim, Policy::Guarded).is_none());
+        let hot = AState::new(vec![ev(0, 0, K::Mut, 0, 4), ev(1, 0, K::Sh, 2, 4)]);
+        let (s2, r) = step(&hot, Menu::CommutativeTrim, Policy::Guarded).unwrap();
+        assert!(matches!(r, Rule::R1Shorten(_, _)));
+        assert!(s2.measure() < hot.measure() || s2.red_edges().len() < hot.red_edges().len());
+    }
+}

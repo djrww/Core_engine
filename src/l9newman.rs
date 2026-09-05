@@ -183,3 +183,70 @@ pub fn newman_check(
         conclusion,
     }
 }
+
+// ===========================================================================
+// 測試(圖鑑 D-1 / DL-001:l9newman.rs 冷點補測)
+// ===========================================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ast::Interval;
+    use crate::rep::Ev;
+
+    fn ev(id: u32, storage: u32, kind: K, s: u32, e: u32) -> Ev {
+        Ev {
+            id,
+            storage,
+            kind,
+            it: Interval { start: s, end: e },
+        }
+    }
+
+    #[test]
+    fn joinable_is_reflexive_and_trims_to_common_successor() {
+        let s = AState::new(vec![ev(0, 0, K::Mut, 0, 4), ev(1, 0, K::Sh, 2, 4)]);
+        assert!(
+            joinable(&s, &s, Menu::CommutativeTrim, Policy::Guarded, 8),
+            "自反"
+        );
+        // 修剪後的共同後繼:兩個狀態在 CommutativeTrim 下閉包相交
+        let a = AState::new(vec![ev(0, 0, K::Mut, 0, 4), ev(1, 0, K::Sh, 2, 4)]);
+        let b = AState::new(vec![ev(0, 0, K::Mut, 0, 2), ev(1, 0, K::Sh, 2, 4)]);
+        assert!(joinable(&a, &b, Menu::CommutativeTrim, Policy::Guarded, 8));
+    }
+
+    #[test]
+    fn normal_forms_singleton_when_no_rules_apply() {
+        let calm = AState::new(vec![ev(0, 0, K::Sh, 0, 2), ev(1, 0, K::Sh, 1, 3)]);
+        let nfs = normal_forms(&calm, Menu::CommutativeTrim, Policy::Guarded, 6);
+        assert_eq!(nfs.len(), 1, "sh-sh 無衝突 ⇒ 唯一正規形(自身)");
+    }
+
+    #[test]
+    fn commutative_trim_passes_newman_mechanically() {
+        // 與 bin/l9newman 同參數:n=3, coord<4, depth=8
+        let r = newman_check(Menu::CommutativeTrim, Policy::Guarded, 3, 4, 8);
+        assert!(r.states > 0);
+        assert!(r.l8_violations.is_empty(), "封閉菜單:L8 嚴格遞減");
+        assert!(r.non_joinable.is_empty(), "WCR:臨界對全部可回合");
+        assert!(r.multi_nf.is_empty(), "唯一正規形");
+        assert!(r.conclusion.contains("機械驗證通過"));
+        assert!(r.critical_pairs > 0, "演示域內應存在臨界對");
+    }
+
+    #[test]
+    fn naive_menu_reports_counterexamples_honestly() {
+        let r = newman_check(Menu::Naive, Policy::Guarded, 3, 4, 8);
+        let broken = !r.non_joinable.is_empty() || !r.multi_nf.is_empty();
+        assert!(broken, "樸素菜單必須如實暴露反例(側條件是定律的載體)");
+        assert!(!r.conclusion.contains("機械驗證通過"));
+    }
+
+    #[test]
+    fn report_fields_are_consistent() {
+        let r = newman_check(Menu::CommutativeTrim, Policy::Guarded, 2, 3, 6);
+        assert_eq!(r.menu, Menu::CommutativeTrim);
+        assert_eq!(r.policy, Policy::Guarded);
+        assert!(r.unique_nf_states <= r.states);
+    }
+}

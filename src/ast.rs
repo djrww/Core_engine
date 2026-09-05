@@ -289,12 +289,37 @@ impl<'a> EventCollector<'a> {
             }
             Kind::FnItem => {
                 let body = child_of_kind(self.t, node, Kind::Block).unwrap();
+                // 潛伏 bug 修復(DL-001):collect_decls 結束時已把作用域棧彈空,
+                // 事件 walker 必須自己對稱重建作用域,否則 lookup 永遠失敗
+                //(extract 對任何輸入都 0 事件/0 借鏈 —— 事實層整體空轉)。
+                let body_span = self.t.node(body).span;
+                let params: Vec<usize> = self
+                    .facts
+                    .bindings
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, b)| b.is_param && b.scope == body_span)
+                    .map(|(i, _)| i)
+                    .collect();
+                self.scopes.push(params);
                 self.walk_node(body, Ctx::Value);
+                self.scopes.pop();
             }
             Kind::Block => {
+                let bspan = self.t.node(node).span;
+                let declared: Vec<usize> = self
+                    .facts
+                    .bindings
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, b)| !b.is_param && b.scope == bspan)
+                    .map(|(i, _)| i)
+                    .collect();
+                self.scopes.push(declared);
                 for c in self.t.node(node).children.clone() {
                     self.walk_node(c, Ctx::Value);
                 }
+                self.scopes.pop();
             }
             Kind::LetStmt => {
                 // let [mut] IDENT [= expr] ;
@@ -337,6 +362,10 @@ impl<'a> EventCollector<'a> {
                                     });
                                 }
                             }
+                            // 潛伏 bug 修復(DL-001):借鏈記錄後仍要 walk 表達式,
+                            // 否則 &/&mut 借用事件永遠不進事件流,衝突圖缺借用頂點
+                            //(UnaryExpr 借用臂會 emit 且不把本體再計 read)。
+                            self.walk_node(en, Ctx::Borrowed);
                         } else {
                             self.walk_node(en, Ctx::Value);
                         }
@@ -664,4 +693,156 @@ pub fn greedy_chromatic(intervals: &[Interval]) -> usize {
         maxc = maxc.max(c + 1);
     }
     maxc
+}
+
+// ===========================================================================
+// 測試(圖鑑 D-1 / DL-001:ast.rs 冷點補測)
+// ===========================================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parse::parse;
+
+    /// 與 bin/cl0r0 相同的含借用衝突樣本(&mut x 期間讀 x ⇒ Referent 軌必有紅邊)。
+    const SRC: &str = "fn main() {\n\
+         let mut x = 1;\n\
+         let r = &mut x;\n\
+         let y = x + 1;\n\
+         let z = *r;\n\
+         while z < 10 { f(y); }\n\
+         if z == 3 { f(x); } else { g(); }\n\
+         }";
+
+    fn iv(a: u32, b: u32) -> Interval {
+        Interval { start: a, end: b }
+    }
+
+    #[test]
+    fn evkind_track_labels_and_conflict_table() {
+        for k in [
+            EvKind::Decl,
+            EvKind::Read,
+            EvKind::Move,
+            EvKind::BorrowSh,
+            EvKind::BorrowMut,
+            EvKind::Deref,
+        ] {
+            assert!(!k.label().is_empty());
+        }
+        for t in [Track::Lexical, Track::Nll, Track::Referent] {
+            assert!(!t.label().is_empty());
+        }
+        // §3.3 相容性表:&mut 與一切併發衝突、& 與 move 衝突、其餘合法
+        assert!(conflicts(EvKind::BorrowMut, EvKind::Read));
+        assert!(conflicts(EvKind::Read, EvKind::BorrowMut), "對稱");
+        assert!(conflicts(EvKind::BorrowMut, EvKind::BorrowSh));
+        assert!(conflicts(EvKind::BorrowSh, EvKind::Move));
+        assert!(!conflicts(EvKind::Read, EvKind::Read));
+        assert!(!conflicts(EvKind::BorrowSh, EvKind::Read));
+        assert!(!conflicts(EvKind::BorrowSh, EvKind::BorrowSh));
+    }
+
+    #[test]
+    fn interval_overlap_semantics() {
+        assert!(iv(0, 3).overlaps(&iv(2, 5)));
+        assert!(!iv(0, 3).overlaps(&iv(3, 5)), "半開:鄰接不重疊");
+        assert!(iv(0, 10).overlaps(&iv(2, 3)), "包含");
+        assert!(!iv(5, 6).overlaps(&iv(0, 5)));
+    }
+
+    #[test]
+    fn extract_finds_bindings_links_and_events() {
+        let t = parse(SRC).expect("全化解析必成功");
+        let facts = extract(&t);
+        let names: Vec<&str> = facts.bindings.iter().map(|b| b.name.as_str()).collect();
+        for want in ["x", "r", "y", "z"] {
+            assert!(names.contains(&want), "缺綁定 {}({:?})", want, names);
+        }
+        let x = facts.bindings.iter().find(|b| b.name == "x").unwrap();
+        assert!(x.mutable, "let mut x");
+        // 借用鏈:r = &mut x
+        let ri = facts.bindings.iter().position(|b| b.name == "r").unwrap();
+        let xi = facts.bindings.iter().position(|b| b.name == "x").unwrap();
+        assert!(facts
+            .links
+            .iter()
+            .any(|l| l.ref_binding == ri && l.src_binding == xi && l.kind == EvKind::BorrowMut));
+        // 事件種類覆蓋:decl/read/&mut/deref
+        let kinds: Vec<EvKind> = facts.events.iter().map(|e| e.kind).collect();
+        assert!(kinds.contains(&EvKind::BorrowMut));
+        assert!(kinds.contains(&EvKind::Deref));
+        assert!(kinds.contains(&EvKind::Read));
+        assert!(!facts.events.is_empty());
+    }
+
+    #[test]
+    fn referent_track_has_red_edges_and_shape_matches() {
+        let t = parse(SRC).unwrap();
+        let facts = extract(&t);
+        let edges = red_edges(&facts, Track::Referent);
+        assert!(!edges.is_empty(), "&mut x 期間讀 x ⇒ 必有紅邊");
+        let (verts, ecount) = conflict_graph_shape(&facts, Track::Referent);
+        assert_eq!(ecount, edges.len());
+        assert!(verts >= 2, "每條紅邊貢獻 ≥2 頂點");
+        for e in &edges {
+            assert!(e.a < facts.events.len() && e.b < facts.events.len());
+            assert!(e.span.start <= e.span.end);
+        }
+    }
+
+    #[test]
+    fn perfect_graph_theorem_t2_all_tracks() {
+        let t = parse(SRC).unwrap();
+        let facts = extract(&t);
+        for track in [Track::Lexical, Track::Nll, Track::Referent] {
+            let (ivs, events) = intervals(&facts, track);
+            assert_eq!(ivs.len(), facts.bindings.len(), "每綁定一組區間");
+            let all: Vec<Interval> = ivs.iter().flatten().copied().collect();
+            let omega = max_clique(&all);
+            let chi = greedy_chromatic(&all);
+            assert_eq!(
+                omega,
+                chi,
+                "T2:區間圖完美(χ=ω),{:?} 軌 events={}",
+                track,
+                events.len()
+            );
+        }
+    }
+
+    #[test]
+    fn max_clique_and_chromatic_on_synthetic_lists() {
+        assert_eq!(max_clique(&[]), 0);
+        assert_eq!(greedy_chromatic(&[]), 0);
+        let single = [iv(0, 5)];
+        assert_eq!(max_clique(&single), 1);
+        assert_eq!(greedy_chromatic(&single), 1);
+        let chain = [iv(0, 2), iv(1, 3), iv(5, 7)];
+        assert_eq!(max_clique(&chain), 2, "前兩者相交、第三者孤立");
+        assert_eq!(greedy_chromatic(&chain), 2);
+        let stack = [iv(0, 10), iv(1, 9), iv(2, 8)];
+        assert_eq!(max_clique(&stack), 3);
+        assert_eq!(greedy_chromatic(&stack), 3);
+    }
+
+    #[test]
+    fn span_text_slices_source_verbatim() {
+        let t = parse(SRC).unwrap();
+        assert_eq!(span_text(&t, Span::new(0, SRC.len() as u32)), SRC);
+        let mid = 7;
+        let end = 30;
+        assert_eq!(
+            span_text(&t, Span::new(mid, end)),
+            &SRC[mid as usize..end as usize]
+        );
+    }
+
+    #[test]
+    fn garbage_input_yields_no_facts_and_no_panic() {
+        for garbage in ["", "@@@ )))", "let let let", "fn ("] {
+            let t = parse(garbage).expect("全化:任何輸入都產樹");
+            let facts = extract(&t);
+            assert!(facts.bindings.is_empty(), "{:?} 不應產生綁定", garbage);
+        }
+    }
 }
