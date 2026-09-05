@@ -52,7 +52,7 @@ jobs:
         run: cargo llvm-cov --all-features --workspace --summary-only --fail-under-lines 65
 
       - name: upload lcov coverage artifact
-        run: cargo llvm-cov --all-features --workspace --lcov-output-path lcov.info
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
 
       - name: attach coverage artifact
         uses: actions/upload-artifact@v4
