@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certificationProblem>
+  <input><trs><name>CL0-DD-Core</name></trs></input>
+  <format>cl0r0-internal (CPF-inspired, not CeTA-loadable)</format>
+  <proof>
+    <crDecreasingDiagrams>
+      <labels count="3">
+        <label name="Trim"/>
+        <label name="Split"/>
+        <label name="Runtime"/>
+
+      </labels>
+      <strictOrder count="3">
+        <pair greater="Split" lesser="Trim"/>
+        <pair greater="Runtime" lesser="Split"/>
+        <pair greater="Runtime" lesser="Trim"/>
+
+      </strictOrder>
+    </crDecreasingDiagrams>
+  </proof>
+</certificationProblem>

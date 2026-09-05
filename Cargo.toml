@@ -1,0 +1,76 @@
+[package]
+name = "cl0r0"
+version = "0.2.0"
+edition = "2021"
+description = "CL0/R0 dual carrier: surface syntax trees, nine laws (L1-L9) extended to 18 formal lemmas (L1-L18), decreasing diagrams, mechanical self-verification"
+license = "MIT"
+
+[lib]
+name = "cl0r0"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cl0r0"
+path = "src/bin/cl0r0.rs"
+
+[[bin]]
+name = "l9newman"
+path = "src/bin/l9newman.rs"
+
+[[bin]]
+name = "dd_verify"
+path = "src/bin/dd_verify.rs"
+
+[[bin]]
+name = "verify_all"
+path = "src/bin/verify_all.rs"
+
+[[bin]]
+name = "pipeline_runner"
+path = "src/bin/pipeline_runner.rs"
+
+[[bin]]
+name = "cert_factory"
+path = "src/bin/cert_factory.rs"
+
+[[bin]]
+name = "coco_benchmark"
+path = "src/bin/coco_benchmark.rs"
+
+[[bin]]
+name = "fuzz_daemon"
+path = "src/bin/fuzz_daemon.rs"
+
+[[bin]]
+name = "fuzz"
+path = "src/bin/fuzz.rs"
+
+[[bin]]
+name = "cl0r0_lsp"
+path = "src/bin/lsp_server.rs"
+
+[[bin]]
+name = "lemma_stress_coverage"
+path = "src/bin/lemma_stress_coverage.rs"
+
+[[bin]]
+name = "ci_verify"
+path = "src/bin/ci_verify.rs"
+
+[[bin]]
+name = "rocq_verify"
+path = "src/bin/rocq_verify.rs"
+
+[[bin]]
+name = "creusot_verify"
+path = "src/bin/creusot_verify.rs"
+
+[[bin]]
+name = "dev_prover"
+path = "src/bin/dev_prover.rs"
+
+[profile.release]
+debug = true
+opt-level = 3
+lto = true
+codegen-units = 1

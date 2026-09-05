@@ -1,0 +1,14 @@
+/// ===================================================
+/// CL0 Generated Polonius Datalog Facts
+/// ===================================================
+loan_issued_at('orig_0, 0, 0).
+borrow_live_at('orig_0, 0).
+borrow_live_at('orig_0, 1).
+borrow_live_at('orig_0, 2).
+borrow_live_at('orig_0, 3).
+loan_issued_at('orig_0, 1, 2).
+borrow_live_at('orig_0, 2).
+borrow_live_at('orig_0, 3).
+borrow_live_at('orig_0, 4).
+borrow_live_at('orig_0, 5).
+invalidates(2, 0).

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certificationProblem>
+  <input><trs><name>CL0-KB-Core</name></trs></input>
+  <format>cl0r0-internal (CPF-inspired, not CeTA-loadable)</format>
+  <proof>
+    <crKnuthBendix>
+      <terminationWitness>LivenessBounded(span ≤ 4, storages = 1)</terminationWitness>
+      <criticalPairs count="1" joinable="true">
+        <pair>
+          <left>[(0, 0, Mut, 0, 1), (1, 0, Sh, 1, 4)]</left>
+          <right>[(0, 0, Mut, 0, 3), (1, 0, Sh, 1, 4)]</right>
+          <joined>[(0, 0, Mut, 0, 1), (1, 0, Sh, 1, 4)]</joined>
+        </pair>
+</criticalPairs>
+    </crKnuthBendix>
+  </proof>
+</certificationProblem>

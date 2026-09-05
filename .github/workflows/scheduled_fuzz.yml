@@ -1,0 +1,29 @@
+name: "Scheduled 4-Hour Fuzzing Gate"
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+jobs:
+  fuzz-matrix:
+    name: "4h-fuzz · Seed 0xC1020240001"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust 1.98.0 Toolchain
+        uses: dtolnay/rust-toolchain@1.98.0
+        with:
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run DD Verification & CPF Certificate Check
+        run: cargo run --bin dd_verify
+
+      - name: Run Deep Fuzzing
+        run: cargo run --release --bin fuzz
+        env:
+          FUZZ_ITERATIONS: 100000
+          RUST_BACKTRACE: 1
