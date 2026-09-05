@@ -47,6 +47,7 @@ pub mod diff_tree;
 pub mod differential_checker;
 pub mod discrimination_tree;
 pub mod edit;
+pub mod fuzz_engine;
 pub mod gen;
 pub mod isabelle_export;
 pub mod json_report;

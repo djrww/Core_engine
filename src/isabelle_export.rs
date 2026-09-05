@@ -128,3 +128,68 @@ mod tests {
         assert!(thy.contains("datatype cl0_fun"));
     }
 }
+
+#[cfg(test)]
+mod extra_tests {
+    use super::*;
+    use crate::cpf_cert::CriticalPairWitness;
+
+    #[test]
+    fn theory_header_imports_and_datatypes() {
+        let cert = CPFCertificate::new_knuth_bendix(
+            "K",
+            "W",
+            vec![CriticalPairWitness::new("L", "R", "J")],
+        );
+        let thy = IsabelleExporter::export_theory("T", &cert);
+        assert!(thy.starts_with("theory T\n"));
+        assert!(thy.contains("IsaFoR.Decreasing_Diagrams"));
+        assert!(ty_contains(&thy, "datatype cl0_sort"));
+        assert!(thy.contains("begin"));
+        assert!(thy.contains("end"));
+    }
+
+    fn ty_contains(s: &str, n: &str) -> bool {
+        s.contains(n)
+    }
+
+    #[test]
+    fn dd_certificate_branch_rendering() {
+        let cert = CPFCertificate::new_decreasing_diagrams(
+            "CL0_DD_Isa",
+            vec!["Trim".into(), "Split".into(), "Runtime".into()],
+            vec![("Split".into(), "Trim".into())],
+        );
+        let thy = IsabelleExporter::export_theory("T_DD", &cert);
+        assert!(
+            thy.contains("Decreasing Diagrams"),
+            "DD 證書應標註 van Oostrom DD"
+        );
+        assert!(
+            thy.contains("theorem cl0_dd_confluence"),
+            "DD 分支亦陳述(註釋)定理"
+        );
+        // 標籤清單與嚴格序對應投影進 wfP_on 與 label_poset 定義。
+        assert!(
+            thy.contains("wfP_on ([\"Trim\", \"Split\", \"Runtime\"])"),
+            "labels 應投影進 wfP_on: {}",
+            thy
+        );
+        assert!(
+            thy.contains("label_poset = [(\"Split\", \"Trim\")]"),
+            "嚴格序對應投影進 label_poset"
+        );
+        assert!(thy.starts_with("theory T_DD\n"), "理論名應出現於頭部");
+    }
+
+    #[test]
+    fn orthogonal_certificate_branch_rendering() {
+        let cert = CPFCertificate {
+            system_id: "O".into(),
+            proof_type: crate::cpf_cert::ProofType::OrthogonalLeftLinear,
+        };
+        let thy = IsabelleExporter::export_theory("T_Orth", &cert);
+        assert!(!thy.is_empty());
+        assert!(thy.contains("begin"));
+    }
+}

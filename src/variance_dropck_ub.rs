@@ -425,4 +425,171 @@ mod tests {
         // 4. Stacked Borrows 衝突 (有讀者時發起寫入)
         assert!(UbDiagnosticOracle::check_stacked_borrows_access(true, true, 2).is_some());
     }
+
+    #[test]
+    fn test_variance_lattice_compose_join_and_display() {
+        use Variance::*;
+        // compose 乘法複合:吸收律(0 吸收一切)、(*) 吸收除 0 外一切。
+        assert_eq!(Bivariant.compose(Invariant), Bivariant);
+        assert_eq!(Covariant.compose(Bivariant), Bivariant);
+        assert_eq!(Invariant.compose(Covariant), Invariant);
+        assert_eq!(Covariant.compose(Contravariant), Contravariant);
+        assert_eq!(Contravariant.compose(Covariant), Contravariant);
+        assert_eq!(Contravariant.compose(Contravariant), Covariant);
+        // join 格 LUB:0 為單位元、同值冪等、異值取 (*)。
+        assert_eq!(Bivariant.join(Invariant), Invariant);
+        assert_eq!(Covariant.join(Bivariant), Covariant);
+        assert_eq!(Covariant.join(Covariant), Covariant);
+        assert_eq!(Covariant.join(Contravariant), Invariant);
+        assert_eq!(Invariant.join(Contravariant), Invariant);
+        // Display 四態
+        let text = format!("{Covariant} {Contravariant} {Invariant} {Bivariant}");
+        assert_eq!(
+            text,
+            "Covariant (+) Contravariant (-) Invariant (*) Bivariant (0)"
+        );
+    }
+
+    #[test]
+    fn test_infer_variance_exhaustive_branches() {
+        use Variance::*;
+        let t = MirType::TypeParam("T".into());
+        // 生命週期參數命中 → 協變;未命中 → 雙變。
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&MirType::LifetimeParam("'a".into()), "'a"),
+            Covariant
+        );
+        // 基礎型別不含 T → 雙變。
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&MirType::Bool, "T"),
+            Bivariant
+        );
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&MirType::Never, "T"),
+            Bivariant
+        );
+        // Tuple:join 合併。
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(
+                &MirType::Tuple(vec![t.clone(), MirType::Bool]),
+                "T"
+            ),
+            Covariant
+        );
+        // &'a mut u8(內層雙變) → 雙變;*mut T → 不變;*const T → 協變。
+        let mut_no_t = MirType::Ref(
+            crate::mir::RegionVid(0),
+            Box::new(MirType::Uint(8)),
+            BorrowKind::Mut {
+                allow_two_phase_borrow: false,
+            },
+        );
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&mut_no_t, "T"),
+            Bivariant
+        );
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(
+                &MirType::RawPtr(Box::new(t.clone()), true),
+                "T"
+            ),
+            Invariant
+        );
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(
+                &MirType::RawPtr(Box::new(t.clone()), false),
+                "T"
+            ),
+            Covariant
+        );
+        // Array/Slice 對元素協變。
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&MirType::Array(Box::new(t.clone()), 3), "T"),
+            Covariant
+        );
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&MirType::Slice(Box::new(t.clone())), "T"),
+            Covariant
+        );
+        // FnPtr:回傳位置協變。
+        let fn_ret_t = MirType::FnPtr {
+            params: vec![MirType::Bool],
+            ret: Box::new(t.clone()),
+        };
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&fn_ret_t, "T"),
+            Covariant
+        );
+        // Adt 欄位 join。
+        let adt = MirType::Adt {
+            name: "Box".into(),
+            fields: vec![("0".into(), t.clone())],
+        };
+        assert_eq!(
+            VarianceEngine::infer_variance_of_param(&adt, "T"),
+            Covariant
+        );
+    }
+
+    #[test]
+    fn test_ub_violation_display_all_six_families() {
+        let cases = [
+            UbViolation::AliasingViolation {
+                description: "共享引用存活時寫入".into(),
+                target_place: "*r".into(),
+            },
+            UbViolation::InvalidBitPattern {
+                type_name: "bool".into(),
+                raw_value: 2,
+                reason: "僅允許 0/1".into(),
+            },
+            UbViolation::NullOrDanglingDereference { address: 0xdead },
+            UbViolation::MisalignedAccess {
+                address: 0x1001,
+                required_alignment: 8,
+            },
+            UbViolation::DataRace {
+                location: "x".into(),
+                conflicting_threads: (3, 7),
+            },
+            UbViolation::UnwindAcrossFfiBoundary {
+                extern_fn: "c_abort".into(),
+            },
+        ];
+        for v in &cases {
+            let s = v.to_string();
+            assert!(s.starts_with("UB: "), "Display 應以 UB: 開頭: {s}");
+            assert!(!s.ends_with(' '), "Display 不應以空白結尾: {s}");
+        }
+        // 六家族逐一關鍵詞
+        assert!(cases[0].to_string().contains("別名規則違反"));
+        assert!(cases[1].to_string().contains("無效位元模式"));
+        assert!(cases[2].to_string().contains("0xdead"));
+        assert!(cases[3].to_string().contains("未對齊"));
+        assert!(cases[4].to_string().contains("#3 與 #7"));
+        assert!(cases[5].to_string().contains("c_abort"));
+    }
+
+    #[test]
+    fn test_stacked_borrows_oracle_three_outcomes() {
+        // 寫入 + 缺 Unique Tag(無共享讀者) → 別名違反。
+        let no_unique = UbDiagnosticOracle::check_stacked_borrows_access(true, false, 0);
+        assert!(matches!(
+            no_unique,
+            Some(UbViolation::AliasingViolation { .. })
+        ));
+        // 讀取永遠合法(即使無 Unique、有共享讀者)。
+        assert_eq!(
+            UbDiagnosticOracle::check_stacked_borrows_access(false, false, 3),
+            None
+        );
+        // 合法寫入:有 Unique 且無共享讀者。
+        assert_eq!(
+            UbDiagnosticOracle::check_stacked_borrows_access(true, true, 0),
+            None
+        );
+        // 對齊良好且非空 → None。
+        assert_eq!(UbDiagnosticOracle::check_pointer_access(0x1000, 8), None);
+        assert_eq!(UbDiagnosticOracle::check_pointer_access(7, 1), None);
+    }
 }

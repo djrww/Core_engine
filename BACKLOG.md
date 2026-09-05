@@ -13,6 +13,9 @@
 | DL-005 | CI 裝 Rocq 9.2 消滅 Gate 8 SKIPPED(圖鑑 D-6;若 CI 環境不可行,出 ADR 記錄替代路線) | 證明證書 | done | M | CI Gate 8 = Proven;或 ADR-009 替代方案獲產品負責人驗收 | CI run 33996272152:rocq-core 9.2.0 裝成;verify_all 10/10 Proven·0 SKIP;ci_verify 7/7;rocqchk「Modules were successfully checked」 |
 | DL-006 | unwrap 訊息化第二批(圖鑑 D-3 餘量):parse 6、ast 7、macro_lab 7、polonius_bridge 6、r0 2、rule_labeling 1、lex 1 共 30 處裸 unwrap → expect 帶逐點不變式訊息 | 品質基建 | done | S | 全庫非測試碼裸 unwrap = 0(grep 見證);fmt/clippy/test 全綠 | 全庫掃描 0 處(parse 6/ast 7/macro_lab 7/polonius 6/r0 2/rule_labeling 1/lex 1 共 30 處→expect 逐點不變式;r0 詞界判斷改 is_none_or);169 測試綠 |
 
+| DL-007 | 覆蓋率提升:<74% 七檔拉至各 ≥74%(isabelle_export 66.3 / reparse_verifier 66.7 / rocq_export 67.5 / lsp_bridge 70.1 / lemmas 71.5 / variance_dropck_ub 71.2 / proof_resources 71.7) | 品質基建 | done | M | llvm-cov 逐檔 ≥74%;全量門禁綠 | 本地 llvm-cov:isabelle 100/reparse 88.2/rocq 75.7/lsp 99.3/lemmas 82.0/variance 98.4/proof_resources 99.7;全庫 84.0%;lib +23 測試;fmt/clippy(0 warn)/test 200/200/dev_loop 0 違規;CI 見 commit |
+| DL-008 | bin 下沉第 2 批(圖鑑 D-2 續):cl0r0 九律自証引擎 + fuzz 屬性套件引擎下沉 lib 並補單測 | 品質基建 | done | M | 下沉函數有單測;兩 bin 行數各 −40%;全量門禁綠 | 新 lib fuzz_engine.rs(704 行,8 單測);bin/fuzz.rs 423→44(−89.6%)、bin/cl0r0.rs 265→155(−41.5%),兩 bin 實跑退出碼 0;下沉時修復潛伏投影 bug(初始紅邊 7→5 步→0);CI 見 commit |
+
 ## 凍結規則(章程 §4)
 
 DL-001…DL-005 清空前,不開新功能(阻塞修復與文檔除外);解凍權在產品負責人。

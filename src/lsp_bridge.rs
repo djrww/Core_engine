@@ -126,3 +126,88 @@ impl LspEngine {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const CONFLICT: &str =
+        "fn main() {\n    let mut x = 1;\n    let r = &mut x;\n    let y = x + 1;\n}";
+
+    #[test]
+    fn conflict_source_gets_e0502_diag_and_quickfix() {
+        let (diags, actions) = LspEngine::analyze_and_suggest_actions(CONFLICT);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "E0502");
+        assert_eq!(diags[0].severity, "Error");
+        assert!(
+            diags[0].proof_explanation.contains("Newman Fast Path"),
+            "短源碼走 Newman 解釋"
+        );
+        assert_eq!(actions.len(), 1);
+        assert_eq!(actions[0].kind, "quickfix");
+        assert!(!actions[0].edit_replacement.is_empty());
+        assert_eq!(
+            (actions[0].edit_start, actions[0].edit_end),
+            (0, CONFLICT.len())
+        );
+    }
+
+    #[test]
+    fn long_conflict_source_gets_dd_explanation() {
+        let long = "fn main() {\n    let mut x = 1;\n    let a = x + 1;\n    let b = x + 2;\n    let c = x + 3;\n    let r = &mut x;\n    let d = x + 4;\n    let z = *r;\n}";
+        assert!(long.len() > 100);
+        let (diags, _) = LspEngine::analyze_and_suggest_actions(long);
+        assert_eq!(diags.len(), 1);
+        assert!(
+            diags[0].proof_explanation.contains("Decreasing Diagrams"),
+            "長源碼走 DD 解釋"
+        );
+    }
+
+    #[test]
+    fn clean_source_has_no_diagnostics() {
+        // 解析失敗(遞歸超限 RECURSION_LIMIT=256)的源碼走短路分支:零診斷、零動作。
+        let mut deep = String::from("fn f() { ");
+        for _ in 0..300 {
+            deep.push_str("g(");
+        }
+        deep.push('1');
+        for _ in 0..300 {
+            deep.push(')');
+        }
+        deep.push_str(" }");
+        let (diags, actions) = LspEngine::analyze_and_suggest_actions(&deep);
+        assert!(diags.is_empty(), "超深源碼不應產生診斷");
+        assert!(actions.is_empty(), "超深源碼不應產生動作");
+    }
+
+    #[test]
+    fn json_rpc_dispatch_all_methods_and_unknown() {
+        let cases = [
+            ("{\"method\":\"initialize\",\"id\":7}", "\"id\":7"),
+            (
+                "{\"method\":\"textDocument/codeAction\",\"id\":3}",
+                "\"id\":3",
+            ),
+            ("{\"method\":\"textDocument/hover\",\"id\":9}", "markdown"),
+            (
+                "{\"method\":\"textDocument/inlayHint\"}",
+                "\"label\":\"[✓ DD Confluent]\"",
+            ),
+            ("{\"method\":\"textDocument/formatting\"}", "\"result\":[]"),
+            ("{\"method\":\"shutdown\",\"id\":12}", "\"result\":null"),
+        ];
+        for (req, expect) in cases {
+            let resp = LspEngine::process_json_rpc(req).unwrap();
+            assert!(resp.contains(expect), "{} 不含 {}", req, expect);
+        }
+        assert!(
+            LspEngine::process_json_rpc("{\"method\":\"unknown/x\"}").is_none(),
+            "未知方法 ⇒ None"
+        );
+        // 無 id ⇒ 預設 1
+        let resp = LspEngine::process_json_rpc("{\"method\":\"initialize\"}").unwrap();
+        assert!(resp.contains("\"id\":1"));
+    }
+}

@@ -1211,4 +1211,41 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_syntax_topological_ladder_six_rungs_all_certified() {
+        // 拓撲天梯 (L1, L2 -> L5, L3/L4, L6, L7) 六階全 Certified,
+        // 且每一階的存取器 (lemma_id/title/summary) 均可如實讀取。
+        let ladder = LemmaRegistry::verify_syntax_topological_ladder();
+        assert_eq!(ladder.len(), 6, "天梯應含六階");
+        assert!(
+            ladder.iter().all(|r| r.is_certified()),
+            "六階應全 Certified"
+        );
+        let ids: Vec<&str> = ladder.iter().map(|r| r.lemma_id()).collect();
+        assert_eq!(ids, ["L1", "L2", "L5", "L3/L4", "L6", "L7"]);
+        for r in &ladder {
+            assert!(!r.title().is_empty(), "{} title 不應為空", r.lemma_id());
+            assert!(!r.summary().is_empty(), "{} summary 不應為空", r.lemma_id());
+        }
+    }
+
+    #[test]
+    fn test_all_lemmas_expose_full_mathematical_metadata() {
+        // 18 項引理的 id/title/mathematical_statement 三重元數據完整可達。
+        let all = LemmaRegistry::all_lemmas();
+        assert_eq!(all.len(), 18);
+        let mut seen = std::collections::HashSet::new();
+        for l in &all {
+            let id = l.lemma_id();
+            assert!(!id.is_empty(), "lemma_id 不應為空");
+            assert!(seen.insert(id.to_string()), "lemma_id {id} 不應重複");
+            assert!(!l.title().is_empty(), "{id} title 不應為空");
+            let stmt = l.mathematical_statement();
+            assert!(
+                stmt.contains('\\') || stmt.contains('='),
+                "{id} 數學陳述應含數學記號"
+            );
+        }
+    }
 }

@@ -373,4 +373,110 @@ mod tests {
         assert_eq!(joined, Permission::Exclusive);
         assert!(joined.is_writable());
     }
+
+    #[test]
+    fn test_pure_expr_display_all_seven_forms() {
+        use PureExpr::*;
+        let v = Var("x".into());
+        let c = ConstInt(7);
+        let t = Tuple(vec![ConstInt(1), ConstInt(2), Var("y".into())]);
+        let a = Apply("succ".into(), vec![ConstInt(41), ConstInt(42)]);
+        let l = Let(
+            "z".into(),
+            Box::new(ConstInt(3)),
+            Box::new(Add(Box::new(Var("z".into())), Box::new(ConstInt(1)))),
+        );
+        let add = Add(Box::new(ConstInt(1)), Box::new(ConstInt(2)));
+        let sub = Sub(Box::new(ConstInt(5)), Box::new(ConstInt(2)));
+        let mul = Mul(Box::new(ConstInt(3)), Box::new(ConstInt(4)));
+        // 逐一驗證七種形式的 Display 語法
+        assert_eq!(v.to_string(), "x");
+        assert_eq!(c.to_string(), "7");
+        assert_eq!(t.to_string(), "(1, 2, y)");
+        assert_eq!(a.to_string(), "succ(41, 42)");
+        assert_eq!(l.to_string(), "let z = 3 in (z + 1)");
+        assert_eq!(add.to_string(), "(1 + 2)");
+        assert_eq!(sub.to_string(), "(5 - 2)");
+        assert_eq!(mul.to_string(), "(3 * 4)");
+        // 嵌套組合亦應保持括號平衡
+        let nested = Mul(Box::new(add), Box::new(sub));
+        assert_eq!(nested.to_string(), "((1 + 2) * (5 - 2))");
+    }
+
+    #[test]
+    fn test_eval_expr_let_scoping_and_arithmetic() {
+        let mut env = HashMap::new();
+        env.insert("base".to_string(), 10);
+        // Let 綁定局部作用域:let z = 5 in (z - base)
+        let expr = PureExpr::Let(
+            "z".into(),
+            Box::new(PureExpr::ConstInt(5)),
+            Box::new(PureExpr::Sub(
+                Box::new(PureExpr::Var("z".into())),
+                Box::new(PureExpr::Var("base".into())),
+            )),
+        );
+        assert_eq!(AeneasTranslator::eval_expr(&expr, &env), 5 - 10);
+        // Var 未綁定 → 預設 0;Mul/Sub 實算。
+        let mul = PureExpr::Mul(
+            Box::new(PureExpr::Var("unknown".into())),
+            Box::new(PureExpr::ConstInt(9)),
+        );
+        assert_eq!(AeneasTranslator::eval_expr(&mul, &HashMap::new()), 0);
+        let sub = PureExpr::Sub(
+            Box::new(PureExpr::ConstInt(2)),
+            Box::new(PureExpr::ConstInt(9)),
+        );
+        assert_eq!(AeneasTranslator::eval_expr(&sub, &HashMap::new()), -7);
+        // Tuple/Apply 求值恆為 0(純化約定的佔位值)。
+        let tup = PureExpr::Tuple(vec![PureExpr::ConstInt(1)]);
+        assert_eq!(AeneasTranslator::eval_expr(&tup, &HashMap::new()), 0);
+        let app = PureExpr::Apply("f".into(), vec![PureExpr::ConstInt(1)]);
+        assert_eq!(AeneasTranslator::eval_expr(&app, &HashMap::new()), 0);
+    }
+
+    #[test]
+    fn test_permission_lattice_full_outcomes() {
+        // None 不可讀;Shared(0.0) 不可讀;Shared(0.3) 可讀不可寫。
+        assert!(!Permission::None.is_readable());
+        assert!(!Permission::Shared(0.0).is_readable());
+        assert!(Permission::Shared(0.3).is_readable());
+        assert!(!Permission::Shared(0.3).is_writable());
+        // split:Shared(q) 對半;None 拒絕。
+        let (a, b) = Permission::Shared(0.25).split().unwrap();
+        assert_eq!(a, Permission::Shared(0.125));
+        assert_eq!(b, Permission::Shared(0.125));
+        assert!(Permission::None.split().is_err());
+        assert!(Permission::Shared(0.0).split().is_err());
+        // join:None 為單位元;和 <1 為 Shared;和 >1 違反守恆律;Exclusive 衝突。
+        let none = Permission::None;
+        assert_eq!(
+            none.join(&Permission::Shared(0.4)),
+            Ok(Permission::Shared(0.4))
+        );
+        assert_eq!(
+            Permission::Shared(0.4).join(&none),
+            Ok(Permission::Shared(0.4))
+        );
+        assert_eq!(
+            Permission::Shared(0.4).join(&Permission::Shared(0.25)),
+            Ok(Permission::Shared(0.65))
+        );
+        assert_eq!(
+            Permission::Shared(0.4).join(&Permission::Shared(0.7)),
+            Err("權限總和 1.1 超出 1.0 (違反分離邏輯守恆律)".to_string())
+        );
+        assert_eq!(
+            Permission::Exclusive.join(&Permission::Shared(0.2)),
+            Err("衝突的排他權限合併".to_string())
+        );
+        // PermissionState:未登記 place 恆為 None;登記後如實取回。
+        let mut st = PermissionState::new();
+        assert_eq!(st.get_permission("x"), Permission::None);
+        st.set_permission("x", Permission::Shared(0.5));
+        assert_eq!(st.get_permission("x"), Permission::Shared(0.5));
+        // resolve_borrow:未登記變數回 None。
+        let mut penv = crate::proof_resources::ProphecyEnvironment::new();
+        assert_eq!(penv.resolve_borrow("ghost"), None);
+    }
 }

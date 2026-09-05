@@ -385,3 +385,49 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod extra_tests {
+    use super::*;
+
+    #[test]
+    fn kernel_check_tri_state_semantics() {
+        assert!(KernelCheck::Checked.is_checked());
+        assert!(!KernelCheck::NotRun("rocqchk 缺席".into()).is_checked());
+        let r = RocqCompileResult {
+            success: true,
+            module_name: "M".into(),
+            vo_bytes: 10,
+            compilation_duration_ms: 1,
+            kernel_check: KernelCheck::NotRun("test".into()),
+            output_log: String::new(),
+        };
+        assert!(!r.checked_by_rocqchk(), "未跑 rocqchk 不得稱 Checked(F-12)");
+    }
+
+    #[test]
+    fn binary_paths_are_option_honest() {
+        // 本機/CI 皆可能裝 Rocq:兩態都合法,但不得 panic
+        let _ = RocqExporter::get_rocq_binary_path();
+        let _ = RocqExporter::get_rocqchk_binary_path();
+        let _ = RocqExporter::check_rocq_available();
+    }
+
+    #[test]
+    fn compile_and_verify_err_message_when_rocq_absent() {
+        if RocqExporter::check_rocq_available() {
+            return; // 環境有 rocq:路徑由 CI rocq_verify 覆蓋
+        }
+        let err = RocqExporter::compile_and_verify("Lemma t : True. Qed.", "CL0_Absent")
+            .expect_err("無 rocq ⇒ Err");
+        assert!(err.contains("not found"), "如實說明缺席:{}", err);
+    }
+
+    #[test]
+    fn full_theory_carries_module_name_and_core_sections() {
+        let s = RocqExporter::export_full_cl0_theory("CL0_NameProbe");
+        assert!(s.contains("CL0_NameProbe"));
+        assert!(s.contains("Inductive sort"));
+        assert!(s.contains("end"));
+    }
+}

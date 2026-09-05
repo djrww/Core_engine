@@ -1,14 +1,14 @@
 # FEATURE_ATLAS — 全功能圖鑑與證書冊
 
-> **版本**: v0.2.0 · 2026-09-05
-> **範圍**: 49 個 lib 模組 + 17 個 bin = **66 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
-> **覆蓋率口徑**: CI run `33997238431`(commit `a97178b`,DL-004/006 後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 78.5%**(門檻 72,下一級 80)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
-> **測試**: `cargo test --all-targets` = **169/169 通過**(lib 126 + bins/integration 43;DL-004 selfcheck +4)。
+> **版本**: v0.2.1 · 2026-09-06
+> **範圍**: 50 個 lib 模組 + 17 個 bin = **67 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
+> **覆蓋率口徑**: 本地 `cargo llvm-cov`(DL-007 後,commit 待推送)逐檔 DA 行;**全庫行覆蓋率 84.0%**(門檻 72)。CI lcov 口徑待本輪 run 複核後回填。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
+> **測試**: `cargo test --all-targets` = **200/200 通過**(lib 157 + bins/integration 43;DL-007 補測 +23、DL-008 fuzz_engine +8)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
 
 ---
 
-## 表 1 · 全功能全景(64 項)
+## 表 1 · 全功能全景(67 項)
 
 欄位:**功能**(原始檔)/ **可以做咩**(用途)/ **內嵌左啲咩**(核心算法·資料結構·定理)/ **語法層**(lex → parse → AST/TT → MIR → 語義/證明 所處階層)/ **語義係咩**(數學語義·依據定理)/ **覆蓋率**。
 
@@ -56,37 +56,38 @@
 | 38 | `differential_checker.rs` | 跨引擎差分測試+黃金標準對賬 | 差分矩陣、DDMin 收斂、評分 | **測試層** | 差分審核評分 99.02% | 88.6% |
 | 39 | `lemma_stress_generator.rs` | 79,000 樣本海量壓測生成+不變量評估 | 18 引理×輸入宇宙、不變量求值器 | **測試層** | 不變量 100% 保持 = 0 defect | 96.2% |
 | 40 | `json_report.rs` | 結構化 JSON 診斷+自動修復管線 | 錯誤分類、修復建議、閉環驗證 | **工程層**(消費語法/語義產物) | 診斷語義;修復 = 證據驅動 | 86.4% |
-| 41 | `lsp_bridge.rs` | LSP CodeAction 互動修法 | JSON-RPC 2.0 處理器 | **工程層** | LSP 協議語義 | 70.1% |
+| 41 | `lsp_bridge.rs` | LSP CodeAction 互動修法 | JSON-RPC 2.0 處理器 | **工程層** | LSP 協議語義 | 99.3% |
 | 42 | `rustc_json.rs` | rustc JSON 診斷 → 重寫自動機 | 診斷解析、ARS 套用 | **工程層** | 外部診斷→內部 ARS 同化 | 95.7% |
 | 43 | `tool_runner.rs` | 外部證明工具子進程封裝 | 單一真相封裝(審計 F-09/F-12/D-03) | **工程層** | 子進程語義:逾時/缺席三態 | 81.8% |
 | 44 | `patch_engine.rs` | 端到端補丁合成閉環自驗 | 補丁生成+自驗 | **工程層** | 合成⇒驗證閉環 | 95.0% |
 | 45 | `pipeline_synthesis.rs` | 五大組合深度合成引擎 | 五階段流水線編排 | **工程層** | 端到端組合語義 | 97.0% |
 | 46 | `cert_generator_factory.rs` | 污料宇宙+證書批量生產 | 污料生成、工廠產線、髒輸入穩健性核驗 | **測試/證書層** | 認證流水線語義 | 95.8% |
 | 47 | `testkit.rs` | 共享測試見證夾具 | fixtures 單一真相(審計 D-01) | **測試基建** | 見證共用語義 | 100% |
-| 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 66.7% |
+| 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 88.2% |
 | 49 | `selfcheck.rs` | verify_all/ci_verify 門禁決策層(可單測) | GateStatus/GateOutcome 三態、GateLedger(strict 語義/退出碼)、17 個門禁「檢查+判定」函數 | **自証決策層**(消費各層產物) | F-01 三態誠實語義的單一真相 | 88.9% |
+| 50 | `fuzz_engine.rs` | 屬性測試套件引擎(lib 化,D-2 第 2 批) | iterative_purify 淨化、residual_bad_errors、tree_axiom_checks 六檢查、normalize_plan 修剪規劃、FuzzConfig(FUZZ_* env)、run_property_suite、track_summaries 三軌、facts_summary_lines | **測試層** | 種子確定性+錯誤跨度挖掘語義 | 92.5% |
 
 ### B. bin 執行程序(17)
 
 | # | 功能(bin) | 可以做咩 | 內嵌左啲咩 | 語法層 | 語義係咩 | 覆蓋率 |
 |---|------|----------|------------|--------|----------|--------|
-| 50 | `cl0r0` | 主演示:九律檢查+幾何/重寫演示 | 九律檢查、幾何演示、R₀ 接線 | 全層演示 | 定律載體巡禮 | 0%* |
-| 51 | `verify_all` | 端到端全量自証(10 門禁) | GATES 常量驅動、三態(Proven/Skipped/Failed)、`--strict` 發布模式 | 全層 | 門禁語義:SKIPPED≠PASSED(F-01) | 0%* |
-| 52 | `ci_verify` | CI 專項 7 大門禁執行器 | 18 引理+壓測+合成+JSON+DAG+MIR+差分 七門禁串聯 | 全層 | CI 驗收閉環 | 0%* |
-| 53 | `macro_lab` | 巨集七原則+借用組合證據鏈(14 門禁) | P1–P7+B1–B6+Θ(n²) 實測;`--verbose` 逐規則傾印 | 巨集/借用層 | 證據鏈語義:14/14 PASS | 0%* |
-| 54 | `dd_verify` | 遞減圖+Newman 自証驅動 | 峰值會合演示、CPF-KB 短證出具 | 語義層 | DD+Newman 雙通道 | 0%* |
-| 55 | `l9newman`(bin) | Newman 快速通道獨立驅動 | SNWitness 出具、耗時計量 | 語義層 | SN∧WCR⇒CR | 0%* |
-| 56 | `rocq_verify` | Rocq 導出+微內核核檢主程序 | tool_runner 三態、rocqchk 呼叫 | 外部證明層 | 微內核複核 | 0%* |
-| 57 | `creusot_verify` | Creusot/Why3 SMT 消解主程序 | Pearlite 契約、Z3 消解 | 外部證明層 | VC 消解語義 | 0%* |
-| 58 | `cert_factory` | 污料宇宙+證書批量生產運行機 | 污料生成、認證產線 | 測試/證書層 | 批量認證 | 0%* |
-| 59 | `coco_benchmark` | 國際合流基準壓測(CoCo) | 基準套件執行、計分 | 語義/交換層 | 基準語義 | 0%* |
-| 60 | `fuzz` | 確定性種子屬性測試主程序 | 種子重現、屬性斷言 | 測試層 | 屬性測試語義 | 0%* |
-| 61 | `fuzz_daemon` | 4 小時輪自動 Fuzzing 守護進程 | 定時排程、日誌 | 測試層 | 守護進程語義 | 0%* |
-| 62 | `lemma_stress_coverage` | 79k 壓測+真實覆蓋率主程序 | 海量樣本、覆蓋率統計 | 測試層 | 壓測證書 | 0%* |
-| 63 | `pipeline_runner` | 五大組合合成驗證程序 | 流水線編排執行 | 工程層 | 組合驗證 | 0%* |
-| 64 | `dev_prover` | 開發階段引理取証+証物提取 | 証物打包、取証流水線 | 證明工程層 | 証物規範 | 0%* |
-| 65 | `lsp_server` | 獨立 LSP 服務二進制 | JSON-RPC 伺服循環 | 工程層 | LSP 服務語義 | 0%* |
-| 66 | `dev_loop` | 開發閉環看板機核裁判 | BACKLOG.md 解析 + 不變式檢查(WIP≤2/done 必有證據/proposed≤5) | 開發流程層(治理) | 閉環不變式語義;違規即非零退出 | 0%* |
+| 51 | `cl0r0` | 主演示:九律檢查+幾何/重寫演示(DL-008 薄殼化,265→155 行) | 九律檢查、幾何演示、R₀ 接線(主體下沉 lib) | 全層演示 | 定律載體巡禮 | 0%* |
+| 52 | `verify_all` | 端到端全量自証(10 門禁) | GATES 常量驅動、三態(Proven/Skipped/Failed)、`--strict` 發布模式 | 全層 | 門禁語義:SKIPPED≠PASSED(F-01) | 0%* |
+| 53 | `ci_verify` | CI 專項 7 大門禁執行器 | 18 引理+壓測+合成+JSON+DAG+MIR+差分 七門禁串聯 | 全層 | CI 驗收閉環 | 0%* |
+| 54 | `macro_lab` | 巨集七原則+借用組合證據鏈(14 門禁) | P1–P7+B1–B6+Θ(n²) 實測;`--verbose` 逐規則傾印 | 巨集/借用層 | 證據鏈語義:14/14 PASS | 0%* |
+| 55 | `dd_verify` | 遞減圖+Newman 自証驅動 | 峰值會合演示、CPF-KB 短證出具 | 語義層 | DD+Newman 雙通道 | 0%* |
+| 56 | `l9newman`(bin) | Newman 快速通道獨立驅動 | SNWitness 出具、耗時計量 | 語義層 | SN∧WCR⇒CR | 0%* |
+| 57 | `rocq_verify` | Rocq 導出+微內核核檢主程序 | tool_runner 三態、rocqchk 呼叫 | 外部證明層 | 微內核複核 | 0%* |
+| 58 | `creusot_verify` | Creusot/Why3 SMT 消解主程序 | Pearlite 契約、Z3 消解 | 外部證明層 | VC 消解語義 | 0%* |
+| 59 | `cert_factory` | 污料宇宙+證書批量生產運行機 | 污料生成、認證產線 | 測試/證書層 | 批量認證 | 0%* |
+| 60 | `coco_benchmark` | 國際合流基準壓測(CoCo) | 基準套件執行、計分 | 語義/交換層 | 基準語義 | 0%* |
+| 61 | `fuzz` | 確定性種子屬性測試主程序(DL-008 薄殼化,423→44 行) | 種子重現、屬性斷言(引擎下沉 `fuzz_engine`) | 測試層 | 屬性測試語義 | 0%* |
+| 62 | `fuzz_daemon` | 4 小時輪自動 Fuzzing 守護進程 | 定時排程、日誌 | 測試層 | 守護進程語義 | 0%* |
+| 63 | `lemma_stress_coverage` | 79k 壓測+真實覆蓋率主程序 | 海量樣本、覆蓋率統計 | 測試層 | 壓測證書 | 0%* |
+| 64 | `pipeline_runner` | 五大組合合成驗證程序 | 流水線編排執行 | 工程層 | 組合驗證 | 0%* |
+| 65 | `dev_prover` | 開發階段引理取証+証物提取 | 証物打包、取証流水線 | 證明工程層 | 証物規範 | 0%* |
+| 66 | `lsp_server` | 獨立 LSP 服務二進制 | JSON-RPC 伺服循環 | 工程層 | LSP 服務語義 | 0%* |
+| 67 | `dev_loop` | 開發閉環看板機核裁判 | BACKLOG.md 解析 + 不變式檢查(WIP≤2/done 必有證據/proposed≤5) | 開發流程層(治理) | 閉環不變式語義;違規即非零退出 | 0%* |
 
 \* bin 0% = 量測空洞(llvm-cov 不計 CI 的 `cargo run` 執行);CI 每輪實跑全 16 bin 且全綠。
 
@@ -127,13 +128,13 @@
 | 類別 | 職責 | 功能(表1 #) | 小計 |
 |------|------|--------------|------|
 | **一·詞法與語法層**(載體前置) | 字節流→token→樹,無損與增量 | lex(1)、parse(2)、span(3)、edit(4)、span_monad(5)、ast(6)、diff_tree(7)、tree(8) | 8 |
-| **二·巨集層**(語法擴展) | 巨集語義之可執行模型與真巨集 | token_tree(9)、macro_lab(10)、bin macro_lab(53) | 3 |
+| **二·巨集層**(語法擴展) | 巨集語義之可執行模型與真巨集 | token_tree(9)、macro_lab(10)、bin macro_lab(54) | 3 |
 | **三·借用與類型語義層** | 借用組合、契約、變異性 | borrow_model(11)、mir(19)、modular_contracts(20)、variance_dropck_ub(21)、polonius_bridge(22) | 5 |
-| **四·重寫與合流層**(語義核心) | 終止、合流、正規形 | rep(12)、rep_dd(13)、dd_checker(14)、rule_labeling(15)、l9newman(16)、bin dd_verify(54)、bin l9newman(55)、maude_engine(35) | 8 |
-| **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器 | lemmas(23)、cpf_cert(24)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(56)、bin creusot_verify(57)、bin cert_factory(58)、bin dev_prover(64) | 12 |
+| **四·重寫與合流層**(語義核心) | 終止、合流、正規形 | rep(12)、rep_dd(13)、dd_checker(14)、rule_labeling(15)、l9newman(16)、bin dd_verify(55)、bin l9newman(56)、maude_engine(35) | 8 |
+| **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器 | lemmas(23)、cpf_cert(24)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(57)、bin creusot_verify(58)、bin cert_factory(59)、bin dev_prover(65) | 12 |
 | **六·實用載體與降階層** | R₀ 子集與語義降階 | r0(17)、r0_lower(18)、rustc_json(42) | 3 |
 | **七·演算法基建層** | 合一、共享、索引 | unification(32)、dag_term(33)、discrimination_tree(34) | 3 |
-| **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(50)、bin verify_all(51)、bin ci_verify(52)、bin coco_benchmark(59)、bin fuzz(60)、bin fuzz_daemon(61)、bin lemma_stress_coverage(62)、bin pipeline_runner(63)、bin lsp_server(65)、bin dev_loop(66)、selfcheck(49) | 24 |
+| **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(51)、bin verify_all(52)、bin ci_verify(53)、bin coco_benchmark(60)、bin fuzz(61)、bin fuzz_daemon(62)、bin lemma_stress_coverage(63)、bin pipeline_runner(64)、bin lsp_server(66)、bin dev_loop(67)、selfcheck(49) | 24 |
 
 **分布**:語法/語義核心(類一、三、四)= 21 項 · 形式化背書(類五)= 12 項 · 品質工程(類八)= 22 項 ——「核心數學」與「驗證工程」雙軌並重。
 
