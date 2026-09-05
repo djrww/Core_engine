@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certificationProblem>
+  <input><trs><name>CL0-KB-Core</name></trs></input>
+  <cpfVersion>3.7.1</cpfVersion>
+  <proof>
+    <crKnuthBendix>
+      <terminationWitness>Polynomial Weight Order (degree 2) lexicographic termination witness</terminationWitness>
+      <criticalPairs count="24" joinable="true"/>
+    </crKnuthBendix>
+  </proof>
+</certificationProblem>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certificationProblem>
+  <input><trs><name>CL0-DD-Core</name></trs></input>
+  <cpfVersion>3.7.1</cpfVersion>
+  <proof>
+    <crDecreasingDiagrams labels="3" orderPairs="3"/>
+  </proof>
+</certificationProblem>

@@ -8,6 +8,7 @@ CL0/R₀ 雙載體的機械自証代碼庫：表面語法樹、18 大形式化�
 
 - 🏛️ **[系統全景架構圖與時序圖 (ARCHITECTURE.md)](ARCHITECTURE.md)**: 涵蓋接入點、第一層 (CLI & MCP)、第二層 (雙載體核心與 18 引理) 與第三層 (Rocq 9.2, Creusot/Why3, Isabelle/CeTA, Polonius, Maude) 之 Mermaid 全景架構圖與端到端驗證修復時序圖。
 - 📜 **[架構決策記錄與開發事項流水簿 (ADR.md)](ADR.md)**: 記錄 ADR-001 至 ADR-008 之完整決策背景、日期時間、發起人、建議事項、狀態與數學見證。
+- 🔬 **[開發階段引理取証工具指南 (PROOF_TOOLCHAIN_GUIDE.md)](PROOF_TOOLCHAIN_GUIDE.md)**: 闡述日常開發期之 CeTA/CPF、Creusot/Why3、Rocq 9.2、Kani 與 DDMin 取証流水線調用方式與証物打包規範。
 - 🛡️ **[唯讀核心專案貢獻指南 (CONTRIBUTING.md)](CONTRIBUTING.md)**: 宣告不可變核心專案政策、7 大 CI 驗收門禁、Rocq 9.2 / Creusot 驗證標準與 DDMin 差分反例提交規範。
 - 📊 **[18 大形式化引理與自証報告 (DEVELOPMENT_PLAN.md)](DEVELOPMENT_PLAN.md)**: 18 大強類型引理矩陣、MIR 降階、OOPSLA 2025 模組化契約與 CI 門禁證明。
 - 📈 **[海量測試數據與差分審核矩陣 (COVERAGE_REPORT.md)](COVERAGE_REPORT.md)**: 79,000 組極限壓測樣本 100% 自証通過與 99.02% 差分審核評分明細。

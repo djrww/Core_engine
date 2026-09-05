@@ -65,6 +65,10 @@ path = "src/bin/rocq_verify.rs"
 name = "creusot_verify"
 path = "src/bin/creusot_verify.rs"
 
+[[bin]]
+name = "dev_prover"
+path = "src/bin/dev_prover.rs"
+
 [profile.release]
 debug = true
 opt-level = 3

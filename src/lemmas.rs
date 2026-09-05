@@ -147,6 +147,29 @@ impl LemmaVerificationResult {
     pub fn is_certified(&self) -> bool {
         matches!(self, LemmaVerificationResult::Certified { .. })
     }
+
+    pub fn lemma_id(&self) -> &'static str {
+        match self {
+            LemmaVerificationResult::Certified { lemma_id, .. } => lemma_id,
+            LemmaVerificationResult::Violated { lemma_id, .. } => lemma_id,
+        }
+    }
+
+    pub fn title(&self) -> &'static str {
+        match self {
+            LemmaVerificationResult::Certified { title, .. } => title,
+            LemmaVerificationResult::Violated { title, .. } => title,
+        }
+    }
+
+    pub fn summary(&self) -> &str {
+        match self {
+            LemmaVerificationResult::Certified {
+                witness_summary, ..
+            } => witness_summary,
+            LemmaVerificationResult::Violated { counterexample, .. } => counterexample,
+        }
+    }
 }
 
 /// 形式化引理特徵 (Formal Lemma Trait)
@@ -1158,7 +1181,20 @@ impl FormalLemma for L18PersistentStructuralSharingTheorem {
 pub struct LemmaRegistry;
 
 impl LemmaRegistry {
-    /// 獲取所有 18 大形式化引理
+    /// 依據拓撲與幾何依賴順序執行語法核心引理天梯階梯驗證 (L1, L2 -> L5, L3/L4, L6, L7)
+    pub fn verify_syntax_topological_ladder() -> Vec<LemmaVerificationResult> {
+        let ladder: Vec<Box<dyn FormalLemma>> = vec![
+            Box::new(L1LosslessRoundtripLemma),
+            Box::new(L2DeterminismLemma),
+            Box::new(L5LaminarityCWComplexLemma),
+            Box::new(L3L4IncrementalReparseLemma),
+            Box::new(L6NamedProjectionHomomorphismLemma),
+            Box::new(L7ErrorTotalizationLemma),
+        ];
+        ladder.iter().map(|l| l.verify_mechanically()).collect()
+    }
+
+    /// 註冊所有 18 項形式化引理
     pub fn all_lemmas() -> Vec<Box<dyn FormalLemma>> {
         vec![
             Box::new(L1LosslessRoundtripLemma),
