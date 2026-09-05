@@ -48,7 +48,7 @@ jobs:
       # F-13:覆蓋率由「只觀測」升級為「有門」。
       # 錨定值說明:2026-09 實測行覆蓋率 68.04%(rust 1.98.0);門檻錨定 65%
       # 防退化,後續應以上調方式逼近審計建議的 95%。
-      - name: generate test code coverage report (gate: lines >= 65%)
+      - name: 'generate test code coverage report (gate: lines >= 65%)'
         run: cargo llvm-cov --all-features --workspace --summary-only --fail-under-lines 65
 
       - name: upload lcov coverage artifact
