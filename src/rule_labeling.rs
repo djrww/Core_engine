@@ -96,7 +96,9 @@ impl RuleLabelingSolver {
             topo_order.push(u);
             if let Some(neighbors) = adj.get(&u) {
                 for &v in neighbors {
-                    let deg = in_degree.get_mut(&v).unwrap();
+                    let deg = in_degree
+                        .get_mut(&v)
+                        .expect("不變式:v 已預先插入 in_degree");
                     *deg -= 1;
                     if *deg == 0 {
                         queue.push_back(v);

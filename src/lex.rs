@@ -217,7 +217,10 @@ pub fn lex(src: &str) -> Vec<Token> {
             }
             _ => {
                 // 非 ASCII 或非法符號:一個 Bad token,長度 = 該字元的 utf8 長度。
-                let ch = src[i..].chars().next().unwrap();
+                let ch = src[i..]
+                    .chars()
+                    .next()
+                    .expect("不變式:迴圈條件 i < src.len() 保證有字元");
                 i += ch.len_utf8();
                 toks.push(Token {
                     kind: TokKind::Bad,

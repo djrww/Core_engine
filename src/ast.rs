@@ -159,11 +159,13 @@ fn collect_decls(
             }
         }
         Kind::FnItem => {
-            let body = child_of_kind(t, node, Kind::Block).unwrap();
+            let body =
+                child_of_kind(t, node, Kind::Block).expect("不變式:FnItem 必含 Block(文法保證)");
             scopes.push(Vec::new());
             for &c in &n.children {
                 if t.node(c).kind == Kind::Param {
-                    let name_node = child_of_kind(t, c, Kind::Ident).unwrap();
+                    let name_node = child_of_kind(t, c, Kind::Ident)
+                        .expect("不變式:該語法必含 Ident(文法保證)");
                     // 參數綁定在 fn body 作用域
                     let b = facts.bindings.len();
                     facts.bindings.push(Binding {
@@ -173,7 +175,7 @@ fn collect_decls(
                         is_param: true,
                         scope: t.node(body).span,
                     });
-                    scopes.last_mut().unwrap().push(b);
+                    scopes.last_mut().expect("不變式:作用域棧非空").push(b);
                 }
             }
             collect_decls(t, body, facts, scopes, false);
@@ -185,7 +187,8 @@ fn collect_decls(
                 let cn = t.node(c);
                 match cn.kind {
                     Kind::LetStmt => {
-                        let name_node = child_of_kind(t, c, Kind::Ident).unwrap();
+                        let name_node = child_of_kind(t, c, Kind::Ident)
+                            .expect("不變式:該語法必含 Ident(文法保證)");
                         let b = facts.bindings.len();
                         let mut mutable = false;
                         // let [mut]
@@ -201,7 +204,7 @@ fn collect_decls(
                             is_param: false,
                             scope: t.node(node).span,
                         });
-                        scopes.last_mut().unwrap().push(b);
+                        scopes.last_mut().expect("不變式:作用域棧非空").push(b);
                         // rhs 中的嵌套塊(block-expr)仍要掃
                         scan_nested_blocks(t, c, facts, scopes);
                     }
@@ -288,7 +291,8 @@ impl<'a> EventCollector<'a> {
                 }
             }
             Kind::FnItem => {
-                let body = child_of_kind(self.t, node, Kind::Block).unwrap();
+                let body = child_of_kind(self.t, node, Kind::Block)
+                    .expect("不變式:FnItem 必含 Block(文法保證)");
                 // 潛伏 bug 修復(DL-001):collect_decls 結束時已把作用域棧彈空,
                 // 事件 walker 必須自己對稱重建作用域,否則 lookup 永遠失敗
                 //(extract 對任何輸入都 0 事件/0 借鏈 —— 事實層整體空轉)。
@@ -347,7 +351,7 @@ impl<'a> EventCollector<'a> {
                             let rbi = self
                                 .scopes
                                 .last()
-                                .unwrap()
+                                .expect("不變式:作用域棧非空")
                                 .iter()
                                 .rev()
                                 .find(|&&b| self.facts.bindings[b].name == name)

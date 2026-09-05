@@ -1229,15 +1229,19 @@ pub fn verify_seven_principles() -> Vec<PrincipleReport> {
     // ---- P3 結構遞減 ⇒ 終止(fuel 內有界;誠實:非 ∀ 證明)----
     let mut p3_ok = true;
     let mut p3_ev = String::new();
-    let entry = reg.iter().find(|d| d.name == "cl0_count_tts").unwrap();
+    let entry = reg
+        .iter()
+        .find(|d| d.name == "cl0_count_tts")
+        .expect("不變式:registry 必含 cl0_count_tts");
     let inner = reg
         .iter()
         .find(|d| d.name == "cl0_count_tts_inner")
-        .unwrap();
+        .expect("不變式:registry 必含 cl0_count_tts_inner");
     let mut max_steps = 0usize;
     for n in 0..=64usize {
         let src = format!("( {} )", std::iter::repeat_n("a ", n).collect::<String>());
-        let input = crate::token_tree::parse_forest(&src).unwrap();
+        let input =
+            crate::token_tree::parse_forest(&src).expect("不變式:\"( a a … )\" 格式必可解析");
         match expand_chain(&[entry, inner], &input, 4096) {
             Ok(tr) => {
                 max_steps = max_steps.max(tr.steps.len());
@@ -1362,16 +1366,20 @@ pub fn verify_seven_principles() -> Vec<PrincipleReport> {
 /// 附加門禁:tt-muncher O(n²) 實證(借.md §3 的公式)
 pub fn complexity_report() -> (bool, String) {
     let reg = registry();
-    let entry = reg.iter().find(|d| d.name == "cl0_count_tts").unwrap();
+    let entry = reg
+        .iter()
+        .find(|d| d.name == "cl0_count_tts")
+        .expect("不變式:registry 必含 cl0_count_tts");
     let inner = reg
         .iter()
         .find(|d| d.name == "cl0_count_tts_inner")
-        .unwrap();
+        .expect("不變式:registry 必含 cl0_count_tts_inner");
     let comps = |n: usize| -> usize {
         let src = format!("( {} )", std::iter::repeat_n("a ", n).collect::<String>());
-        let input = crate::token_tree::parse_forest(&src).unwrap();
+        let input =
+            crate::token_tree::parse_forest(&src).expect("不變式:\"( a a … )\" 格式必可解析");
         expand_chain(&[entry, inner], &input, 65536)
-            .unwrap()
+            .expect("不變式:模型展開在 fuel 內必收斂")
             .telemetry
             .comparisons
     };

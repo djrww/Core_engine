@@ -374,14 +374,20 @@ impl<'a> Parser<'a> {
     }
 
     fn close(&mut self) {
-        let id = self.stack.pop().unwrap();
+        let id = self
+            .stack
+            .pop()
+            .expect("不變式:棧非空(建構期已壓入根/容器)");
         self.depth -= 1;
         self.finalize(id);
     }
 
     fn unwind_to(&mut self, target: usize) {
         while self.stack.len() > target {
-            let id = self.stack.pop().unwrap();
+            let id = self
+                .stack
+                .pop()
+                .expect("不變式:棧非空(建構期已壓入根/容器)");
             self.depth -= 1;
             self.finalize(id);
         }
@@ -405,7 +411,7 @@ impl<'a> Parser<'a> {
     }
 
     fn attach(&mut self, id: NodeId) {
-        let parent = *self.stack.last().unwrap();
+        let parent = *self.stack.last().expect("不變式:棧非空(至少含根)");
         self.link(parent, id);
     }
 
@@ -516,7 +522,7 @@ impl<'a> Parser<'a> {
                 ref mut last_tok,
                 ..
             } = *self;
-            let rd = rd.as_ref().unwrap();
+            let rd = rd.as_ref().expect("不變式:增量模式必持有重析快照 rd");
             clone_subtree(rd.old, oid, delta, nodes, cfgs, first_tok, last_tok)
         };
         self.attach(cloned);
@@ -959,7 +965,7 @@ impl<'a> Parser<'a> {
                                 Ok(()) => {}
                                 Err(ParseIssue::Depth) => return Err(ParseIssue::Depth),
                                 Err(ParseIssue::Syntax) => {
-                                    let top = *self.stack.last().unwrap();
+                                    let top = *self.stack.last().expect("不變式:錯誤恢復時棧非空");
                                     self.set_error(top);
                                     self.unwind_to(self.stack.len() - 1);
                                     let _ = self.recover_wrap(SyncMode::Args);
@@ -1211,7 +1217,12 @@ impl Tree {
             }
             // 葉子節點必須是 token(無子節點)或檢查缺失:這裡只檢查內部節點。
             let first = self.nodes[node.children[0] as usize].span;
-            let last = self.nodes[*node.children.last().unwrap() as usize].span;
+            let last = self.nodes[*node
+                .children
+                .last()
+                .expect("不變式:children 非空(分支節點文法保證)")
+                as usize]
+                .span;
             if node.span != Span::new(first.start, last.end) {
                 return Err(format!(
                     "node {} ({:?}) span {} != children union [{}, {})",

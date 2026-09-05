@@ -322,7 +322,10 @@ pub fn r0_lex(src: &str) -> Vec<R0Token> {
                 push(&mut toks, R0TokKind::RBrack, s, i);
             }
             _ => {
-                let ch = src[i..].chars().next().unwrap();
+                let ch = src[i..]
+                    .chars()
+                    .next()
+                    .expect("不變式:迴圈條件 i < src.len() 保證有字元");
                 i += ch.len_utf8();
                 push(&mut toks, R0TokKind::Bad, s, i);
             }
@@ -401,8 +404,7 @@ pub fn unsupported(src: &str) -> Vec<(&'static str, Span)> {
             let before_ok =
                 start == 0 || !src[..start].ends_with(|c: char| c.is_alphanumeric() || c == '_');
             let after = src[end..].chars().next();
-            let after_ok =
-                after.is_none() || !after.unwrap().is_alphanumeric() && after.unwrap() != '_';
+            let after_ok = after.is_none_or(|c| !c.is_alphanumeric() && c != '_');
             if before_ok && after_ok {
                 out.push((
                     match kw {

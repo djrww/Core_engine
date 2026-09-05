@@ -81,13 +81,14 @@ impl PoloniusBridge {
             out,
             "/// ==================================================="
         )
-        .unwrap();
-        writeln!(out, "/// CL0 Generated Polonius Datalog Facts").unwrap();
+        .expect("不變式:寫入 String 緩衝,fmt::Error 不可能");
+        writeln!(out, "/// CL0 Generated Polonius Datalog Facts")
+            .expect("不變式:寫入 String 緩衝,fmt::Error 不可能");
         writeln!(
             out,
             "/// ==================================================="
         )
-        .unwrap();
+        .expect("不變式:寫入 String 緩衝,fmt::Error 不可能");
 
         for e in &s.evs {
             let origin = format!("'orig_{}", e.storage);
@@ -100,10 +101,11 @@ impl PoloniusBridge {
                 "loan_issued_at({}, {}, {}).",
                 origin, loan_id, point_start
             )
-            .unwrap();
+            .expect("不變式:寫入 String 緩衝,fmt::Error 不可能");
 
             for pt in point_start..point_end {
-                writeln!(out, "borrow_live_at({}, {}).", origin, pt).unwrap();
+                writeln!(out, "borrow_live_at({}, {}).", origin, pt)
+                    .expect("不變式:寫入 String 緩衝,fmt::Error 不可能");
             }
         }
 
@@ -114,7 +116,8 @@ impl PoloniusBridge {
                     && (a.kind == K::Mut || b.kind == K::Mut)
                     && (b.it.start >= a.it.start && b.it.start < a.it.end)
                 {
-                    writeln!(out, "invalidates({}, {}).", b.it.start, a.id).unwrap();
+                    writeln!(out, "invalidates({}, {}).", b.it.start, a.id)
+                        .expect("不變式:寫入 String 緩衝,fmt::Error 不可能");
                 }
             }
         }
