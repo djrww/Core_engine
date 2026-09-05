@@ -2,7 +2,7 @@
 
 > **版本**: v0.2.1 · 2026-09-06
 > **範圍**: 50 個 lib 模組 + 17 個 bin = **67 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
-> **覆蓋率口徑**: 本地 `cargo llvm-cov`(DL-007 後,commit 待推送)逐檔 DA 行;**全庫行覆蓋率 84.0%**(門檻 72)。CI lcov 口徑待本輪 run 複核後回填。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
+> **覆蓋率口徑**: CI run `33999567428`(commit `7879c67`,DL-007/008 後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 84.62%**(門檻 72)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
 > **測試**: `cargo test --all-targets` = **200/200 通過**(lib 157 + bins/integration 43;DL-007 補測 +23、DL-008 fuzz_engine +8)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
 
@@ -63,9 +63,9 @@
 | 45 | `pipeline_synthesis.rs` | 五大組合深度合成引擎 | 五階段流水線編排 | **工程層** | 端到端組合語義 | 97.0% |
 | 46 | `cert_generator_factory.rs` | 污料宇宙+證書批量生產 | 污料生成、工廠產線、髒輸入穩健性核驗 | **測試/證書層** | 認證流水線語義 | 95.8% |
 | 47 | `testkit.rs` | 共享測試見證夾具 | fixtures 單一真相(審計 D-01) | **測試基建** | 見證共用語義 | 100% |
-| 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 88.2% |
+| 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 88.0% |
 | 49 | `selfcheck.rs` | verify_all/ci_verify 門禁決策層(可單測) | GateStatus/GateOutcome 三態、GateLedger(strict 語義/退出碼)、17 個門禁「檢查+判定」函數 | **自証決策層**(消費各層產物) | F-01 三態誠實語義的單一真相 | 88.9% |
-| 50 | `fuzz_engine.rs` | 屬性測試套件引擎(lib 化,D-2 第 2 批) | iterative_purify 淨化、residual_bad_errors、tree_axiom_checks 六檢查、normalize_plan 修剪規劃、FuzzConfig(FUZZ_* env)、run_property_suite、track_summaries 三軌、facts_summary_lines | **測試層** | 種子確定性+錯誤跨度挖掘語義 | 92.5% |
+| 50 | `fuzz_engine.rs` | 屬性測試套件引擎(lib 化,D-2 第 2 批) | iterative_purify 淨化、residual_bad_errors、tree_axiom_checks 六檢查、normalize_plan 修剪規劃、FuzzConfig(FUZZ_* env)、run_property_suite、track_summaries 三軌、facts_summary_lines | **測試層** | 種子確定性+錯誤跨度挖掘語義 | 92.9% |
 
 ### B. bin 執行程序(17)
 
