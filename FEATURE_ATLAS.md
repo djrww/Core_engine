@@ -2,8 +2,8 @@
 
 > **版本**: v0.2.0 · 2026-09-05
 > **範圍**: 48 個 lib 模組 + 17 個 bin = **65 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
-> **覆蓋率口徑**: CI run `33961021652`(commit `959f715`)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 71.3%**(門檻 65%)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
-> **測試**: `cargo test --all-targets` = **123/123 通過**(lib 88 + bins/integration 35)。
+> **覆蓋率口徑**: CI run `33971501247`(commit `7772995`,DL-001 補測後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 75.4%**(門檻 72,DL-003 上調)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
+> **測試**: `cargo test --all-targets` = **165/165 通過**(lib 122 + bins/integration 43;DL-001 +34)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
 
 ---
@@ -21,17 +21,17 @@
 | 3 | `span.rs` | 位址映象 σ: V→ℤ×ℤ 半開區間 | Span 代數、位移函數 | **語法層**(幾何基石) | 連續性公理;L5 嵌套定理 | 88.5% |
 | 4 | `edit.rs` | 編輯操作合成與位移 | 編輯 Monoid、結合律見證 | **語法層** | Edit monoid 恆等律/結合律 | 78.9% |
 | 5 | `span_monad.rs` | 跨度單子(事實層↔AST 逆映射) | Monadic bind、逆同態 | **語法層** | 双向逆同態映射 | 94.4% |
-| 6 | `ast.rs` | 語義區間、liveness 投影、衝突圖 | 區間圖 ⊂ 弦圖 ⊂ 完美圖結構(§3.2) | **語法→語義** | 區間圖著色語義;liveness 半開區間投影 | 41.2% ⚠ |
+| 6 | `ast.rs` | 語義區間、liveness 投影、衝突圖 | 區間圖 ⊂ 弦圖 ⊂ 完美圖結構(§3.2) | **語法→語義** | 區間圖著色語義;liveness 半開區間投影 | 91.2% |
 | 7 | `diff_tree.rs` | 持久化結構共享語法樹、差分快照 | `Arc<DiffAstNode>` 不可變共享、脊椎重構 | **語法層** | L18:共享率 ≥92%(實測 95.08%)、突變語義無損 | 78.9% |
 | 8 | `tree.rs` | 樹操作輔助:無損回環、具名投影檢驗 | `Tree` 方法輔助函數 | **語法層** | CW 複形歐拉公理(χ=1)檢驗 | 95.2% |
 | 9 | `token_tree.rs` | 巨集用 Token 樹解析/渲染/匹配 | TT::Atom/Group、Frag 判別子、match_seq(貪婪+回退) | **巨集語法層**(借.md §0) | 模式匹配語義;Rep 零輪∈候選;telemetry 比較計數 | 84.2% |
 | 10 | `macro_lab.rs` | 巨集七原則實驗室:展開鏈模擬+真巨集對照 | expand_chain(委派語義)、μ 良基遞減(munch_mu)、九系統 registry、P1–P7 門禁、complexity_report、**10 個真巨集**(cl0_safe_vec!/cl0_with_val!/cl0_laminar_scope!/cl0_count_tts!/cl0_double!/cl0_borrow_kind!/cl0_produce!/cl0_consume!/cl0_double_tt!反例/ScopeGuard) | **巨集層**(模型=語法樹;真巨集=語法擴展) | 互斥⇒合流、μ 遞減⇒終止、CPS、hygiene、let sharing、Tree 代換;Θ(n²) 實測 3.45 | 89.6% |
 | 11 | `borrow_model.rs` | 借用組合模型:三算法+Datalog 判定 | κ-矩陣(4 格 3 衝突)、naive O(n²)/sweep O(n log n)/laminar 棧、MiniDatalog(§2 三規則逐字;env 快照回溯)、B1–B6 門禁 | **借用語義層** | 3·o²·n² 搜尋空間解剖;error=∅ ⟺ 無衝突;層狀族 depth×n | 98.2% |
-| 12 | `rep.rs` | 修法菜單重寫系統:終止與合流檢查 | TRS、正規形、critical pairs | **語義層** | SN/CR(WCR+SN⇒CR) | 62.2% ⚠ |
+| 12 | `rep.rs` | 修法菜單重寫系統:終止與合流檢查 | TRS、正規形、critical pairs | **語義層** | SN/CR(WCR+SN⇒CR) | 97.7% |
 | 13 | `rep_dd.rs` | 遞減圖 ARS 抽象(修法菜單) | van Oostrom 規則標號、red_edges 衝突對 | **語義層** | Decreasing Diagrams 定理(局部⇒全局合流,免全局 SN) | 77.2% |
 | 14 | `dd_checker.rs` | 遞減圖+Newman 快速通道核驗 | 偏序標號 Trim≺Split≺Runtime、SNWitness、峰值收斂檢查 | **語義/證書層** | DD 合流;SN∧WCR⇒CR;CPF-KB 短證出具 | 88.7% |
 | 15 | `rule_labeling.rs` | 規則標號啟發式求解 | 良基偏序搜索、嚴格序對 | **語義層** | 標號存在 ⇒ DD 條件成立 | 90.5% |
-| 16 | `l9newman.rs` | 機械 Newman 通道 | 作用域見證、局部 WCR 檢查 | **語義層** | Newman 引理(1942) | 53.6% ⚠ |
+| 16 | `l9newman.rs` | 機械 Newman 通道 | 作用域見證、局部 WCR 檢查 | **語義層** | Newman 引理(1942) | 95.8% |
 | 17 | `r0.rs` | R₀ 實用載體(Rust 子集) | 附錄 B EBNF、LALR(1) 乾淨子集、`unsupported` 邊界防火牆 | **語法+語義層**(第二載體) | 實用載體語義;邊界明確拒絕而非誤判 | 81.5% |
 | 18 | `r0_lower.rs` | R₀ → 事實層降階 | 語義保持降階、liveness 圖生成 | **語義層** | 降階同態保持語義 | 93.1% |
 | 19 | `mir.rs` | MIR 中介表示:CFG/Move/Drop/NLL | 控制流圖、Place 投影、Move 數據流、NLL 借用檢查 | **語義層**(中介表示) | NLL 非詞法生命週期;Def-Use 活躍期 | 75.9% |
@@ -46,7 +46,7 @@
 | 28 | `creusot_export.rs` | Creusot/Why3+Z3 演繹驗證 | Pearlite 預言變量 (current,prophecy)、SMT goals 消解 | **外部證明層** | 預言變量演算;VC 100% 消解 = Proven | 96.5% |
 | 29 | `proof_resources.rs` | Rust 類型作為證明資源 | Aeneas 反向函數、Creusot 預言模型、Prusti 分離邏輯 | **外部證明層** | 分離邏輯契約 | 71.7% |
 | 30 | `tactics.rs` | Coq 風格自動戰術庫 | `congruence`/`lia`/`omega` 模擬 | **證明層** | 決策程序語義 | 99.3% |
-| 31 | `tactic_scheduler.rs` | ARI-COPS 策略調度與對拍 | 策略隊列、命中率統計、NewmanFastPath | **證明工程層** | 策略調度啟發式 | 41.5% ⚠ |
+| 31 | `tactic_scheduler.rs` | ARI-COPS 策略調度與對拍 | 策略隊列、命中率統計、NewmanFastPath | **證明工程層** | 策略調度啟發式 | 99.0% |
 | 32 | `unification.rs` | 近線性一階合一 | DAG 項 union-find、occurs-check | **演算法層** |合一演算法完備性/健全性 | 81.3% |
 | 33 | `dag_term.rs` | DAG 項表示與 Hash-Consing 池 | 指針共享、hash-cons、結構相等 O(1) | **演算法層** | DAG≡樹語義(共享透明) | 91.1% |
 | 34 | `discrimination_tree.rs` | 辨別樹規則索引+指針倒排 | 倒排索引、首符號分派 | **演算法層** | 索引語義:不漏報 | 96.0% |
@@ -57,7 +57,7 @@
 | 39 | `lemma_stress_generator.rs` | 79,000 樣本海量壓測生成+不變量評估 | 18 引理×輸入宇宙、不變量求值器 | **測試層** | 不變量 100% 保持 = 0 defect | 96.2% |
 | 40 | `json_report.rs` | 結構化 JSON 診斷+自動修復管線 | 錯誤分類、修復建議、閉環驗證 | **工程層**(消費語法/語義產物) | 診斷語義;修復 = 證據驅動 | 86.4% |
 | 41 | `lsp_bridge.rs` | LSP CodeAction 互動修法 | JSON-RPC 2.0 處理器 | **工程層** | LSP 協議語義 | 70.1% |
-| 42 | `rustc_json.rs` | rustc JSON 診斷 → 重寫自動機 | 診斷解析、ARS 套用 | **工程層** | 外部診斷→內部 ARS 同化 | 58.0% ⚠ |
+| 42 | `rustc_json.rs` | rustc JSON 診斷 → 重寫自動機 | 診斷解析、ARS 套用 | **工程層** | 外部診斷→內部 ARS 同化 | 95.7% |
 | 43 | `tool_runner.rs` | 外部證明工具子進程封裝 | 單一真相封裝(審計 F-09/F-12/D-03) | **工程層** | 子進程語義:逾時/缺席三態 | 81.8% |
 | 44 | `patch_engine.rs` | 端到端補丁合成閉環自驗 | 補丁生成+自驗 | **工程層** | 合成⇒驗證閉環 | 95.0% |
 | 45 | `pipeline_synthesis.rs` | 五大組合深度合成引擎 | 五階段流水線編排 | **工程層** | 端到端組合語義 | 97.0% |
@@ -154,9 +154,9 @@
 
 | # | 債項 | 風險 | 建議 |
 |---|------|------|------|
-| D-1 | 覆蓋率冷點:`ast.rs` 41.2%、`tactic_scheduler.rs` 41.5%、`l9newman.rs` 53.6%、`rustc_json.rs` 58.0%、`rep.rs` 62.2% | 冷點模組藏邏輯迴歸機率較高 | 各補 3–5 個針對性單元測試,先攻 <50% 兩檔 |
+| D-1 | ~~覆蓋率冷點~~ | **已清(DL-001)**:五檔 91–98%,+34 測試;並修得兩處潛伏 bug(extract 作用域彈空 ⇒ 0 事件;借鏈不 walk ⇒ &mut 事件缺席) | — |
 | D-2 | 16 個 bin 於 llvm-cov 顯示 0%(量測空洞) | bin 內邏輯無單測保護 | 將 bin 主體邏輯下沉為 lib 函數;或 `cargo llvm-cov --run-bin` |
-| D-3 | lib 非測試碼 ~60 處 `unwrap()/expect()`( lex 1、parse 6、ari 11、maude 10 等) | 全部為內部不變式(棧非空/children 非空/rd=Some),fuzz 門禁 2000 樣本+髒輸入 0 Panic 實證不可達;但重構時易誤觸 | 分批換成 `expect("不變式:…")` 帶訊息斷言,首攻 ari_export/maude_engine |
-| D-4 | 覆蓋率門檻 65% 距審計建議 95% 仍遠 | 防退化有效、防缺失不足 | 每季上調:65→72→80,冷點補測後跳板 |
+| D-3 | 裸 unwrap 訊息化 | **第一批已清(DL-002)**:ari_export(11)+maude_engine(10)→ 0;餘量(lex 1、parse 6 等)留待第二批 | 後續批次:parse/ast/polonius_bridge/lemmas |
+| D-4 | 覆蓋率門檻階梯 | **65→72 已清(DL-003,CI 實測 75.4%)**;下一級 80 | DL-004 下沉後再攻 80 |
 | D-5 | `$k:path` 片段不可作巨集呼叫名(Rust 語言限制) | cl0_produce 需 `$k:ident` + 呼叫端解析 | 已定案 ident 方案;如需 path 級別,改 `macro_rules` 內 `use` 絕對路徑再呼叫 |
 | D-6 | Rocq 9.2 不在 CI 環境(Gate 8 永遠 SKIPPED) | 形式化背書鏈缺一角 | CI 加 `rocq-overlay` 或容器側裝 Rocq;或標記 release 前置檢查清單 |
