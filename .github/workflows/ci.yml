@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, C1, CC1, CC2]
+    branches: [main, C1, CC1, CC2, CC2.1, "CC*"]
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
@@ -42,7 +42,13 @@ jobs:
       - name: cargo test
         run: cargo test --all-targets
 
-      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify / creusot_verify)
+      - name: install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: generate test code coverage report
+        run: cargo llvm-cov --all-features --workspace --summary-only
+
+      - name: mechanical self-verification (verify_all / dd_verify / cl0r0 / l9newman / fuzz / cert_factory / pipeline_runner / ci_verify / lemma_stress_coverage / rocq_verify / creusot_verify / dev_prover)
         run: |
           cargo run --bin cl0r0
           cargo run --bin l9newman
@@ -55,6 +61,7 @@ jobs:
           cargo run --bin ci_verify
           cargo run --bin rocq_verify
           cargo run --bin creusot_verify
+          cargo run --bin dev_prover
 
   release:
     name: "release · LTO + opt-level 3"
