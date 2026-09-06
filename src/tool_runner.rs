@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! 外部證明工具子進程封裝(審計 F-09 / F-12 / D-03 單一真相)。
 //!
 //! 過去 `rocq_export` 與 `creusot_export` 各自維護一套同構的

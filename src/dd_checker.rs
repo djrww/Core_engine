@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §4.6 递减图 (Decreasing Diagrams) 与 Newman 快速通道合流核验器。
 //!
 //! 支持双模式核验：

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! 借用組合模型(借.md 第二部分:3·o²·n² 的解剖與機核判定)。
 //!
 //! 模型:借用 `b = (π_b, κ_b, o_b)`——place(投影路徑)、種類(shr/mut)、

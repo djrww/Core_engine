@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! coco_benchmark —— 国际合流基准压力测试 (CoCo Benchmark Suite)。
 //!
 //! 运行: `cargo run --release --bin coco_benchmark`

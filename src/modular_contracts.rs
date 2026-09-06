@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §8.2 模組化函數契約、Reborrow 鏈懸掛語義與循環不動點求解器 (OOPSLA 2025 標準)。
 //!
 //! 解決 MiniRust 等純操作語義「不處理靜態模組化驗證」的理論缺口：

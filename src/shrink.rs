@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §8.2 不变量驱动的 AST 语法树剪枝缩小算法 (Delta Shrinker)。
 //!
 //! 在 Fuzzing 发现反例时，在毫秒级将庞大测试用例精简为 3-5 行最小可重现代码。

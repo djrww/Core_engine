@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §8.4 型別協變/逆變/不變 (Variance)、Dropck 針眼法則與未定義行為 (UB) 核驗預言機 (UCG / Rustonomicon 標準)。
 //!
 //! 融匯 Rust 官方文檔與社群權威規範：

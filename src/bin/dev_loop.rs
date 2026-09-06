@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! dev_loop —— 開發閉環看板機核裁判(DEV_LOOP.md 章程 §4 硬規則的強制者)。
 //!
 //! 讀取 BACKLOG.md(單一真相),檢查閉環不變式:
@@ -22,7 +24,7 @@ const VALID_STATES: [&str; 6] = [
     "parked",
 ];
 /// 三隊(章程 §1)
-const VALID_TEAMS: [&str; 3] = ["語法語義", "證明證書", "品質基建"];
+const VALID_TEAMS: [&str; 4] = ["語法語義", "證明證書", "品質基建", "產品化"];
 /// WIP 硬上限:building + verifying
 const WIP_MAX: usize = 2;
 /// proposed 堆積上限

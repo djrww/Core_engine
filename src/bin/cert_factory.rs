@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! cert_factory —— 污料生成宇宙与形式化证书批量生产运行机。
 //!
 //! 运行: `cargo run --bin cert_factory`

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! l9newman —— 機械的 Newman 通道驅動程序(§4.3)。
 //!
 //! 對每個菜單機械驗證:

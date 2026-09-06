@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §10.1 五大核心组合深度合成引擎 (End-to-End Five-Stage Synthesized Pipeline)。
 //!
 //! 本模块将代碼庫的 5 个子系统组合深度串联为无缝闭环：

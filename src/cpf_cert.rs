@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §6.2 原生輕量級 CPF 風格 (CPF-inspired) 證書載體與核驗器。
 //!
 //! 【規格聲明 — 審計 F-04 止損】本模組輸出的 XML 為**內部證書交換格式**:

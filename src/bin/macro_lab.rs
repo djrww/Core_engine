@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! macro_lab —— 巨集七原則 + 借用組合模型 · 證據鏈主程序。
 //!
 //! 對應 MACRO_SEVEN_PRINCIPLES.md 佈署計畫的驗收層:

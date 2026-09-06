@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! # 有向無環圖項 (DAG Term Representation & Hash-Consing Pool)
 //!
 //! 將一階項表示為有向無環圖 (DAG)。當兩個或多個分支共享同一個子項時，

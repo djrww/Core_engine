@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! 巨集七原則實驗室(借.md → 機核實作)。
 //!
 //! 把《借.md》的 TRS 形式框架落成可機械檢查的規則樹系統:

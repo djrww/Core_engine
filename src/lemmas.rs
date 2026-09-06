@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! # 形式化引理庫 (Formal Lemma Registry & Mechanical Proof Witnesses)
 //!
 //! 本模組將 CL0/R₀ 雙載體系統中的核心數學引理、重寫定理、幾何拓撲公理與差分不變量形式化為 Rust 強類型結構與機械自証執行器。

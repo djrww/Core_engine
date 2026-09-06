@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §2.1 編輯單體(edit monoid)。
 //!
 //! 一次編輯 e = (start, old_end, new_end, text)。位移函數(照抄報告公式):

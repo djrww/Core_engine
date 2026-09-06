@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! creusot_verify —— Creusot / Why3 演繹驗證與 Pearlite 契約機械消解主程序。
 //!
 //! 運行: `cargo run --bin creusot_verify`

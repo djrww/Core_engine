@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §8.3 Rust 類型作為證明資源：Aeneas 反向函數、Creusot 預言模型與 Prusti 分離邏輯 (Proof Resources Engine)。
 //!
 //! 將 Rust 嚴格的 Ownership / Borrowing 語義轉化為高階形式化證明資源：

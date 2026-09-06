@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! CL0 詞法層(§5.1 詞法層:DFA——CL0 詞法完全正則)。
 //!
 //! 不變量(詞法不變量,由測試 `lex_lexical_invariants` 機械驗證):

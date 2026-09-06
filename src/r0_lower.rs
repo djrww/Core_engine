@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §7.3 R₀ 实用载体语义降阶引擎 (Lowering to Fact Layer & Liveness Graphs)。
 //!
 //! 将 R₀ CST 表面语法树降阶为控制流图与事实层事件流 (Ev)，

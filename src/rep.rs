@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §4 重寫系統 —— 修法菜單(repair menu)的終止與合流。
 //!
 //! ARS (A, →):A = 「活躍區間配置」(幾何事實層的狀態),→ = 菜單規則單步。

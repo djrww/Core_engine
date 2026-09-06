@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! Token 樹(TT)模型 —— 巨集規則樹的載體(借.md §0 形式框架)。
 //!
 //! macro_rules 的匹配對象是有序 token 森林;本模組提供最小可用的樹模型

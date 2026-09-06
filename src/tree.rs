@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! 樹的工具:樹操作放在 `Tree` 的方法與此處的輔助函數。
 //! (無損回環、具名投影、CW 複形的其它檢驗在這裡。)
 

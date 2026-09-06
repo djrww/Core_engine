@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! fuzz_daemon —— 本地 4 小时一轮自动化 Fuzzing 守护进程。
 //!
 //! 运行: `cargo run --release --bin fuzz_daemon`

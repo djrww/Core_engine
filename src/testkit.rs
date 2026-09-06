@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! 共享測試/自証見證夾具(審計 D-01:六處手抄巨塊的單一真相)。
 //!
 //! `Ev { id, storage, kind, it }` 構造塊過去在 `bin/coco_benchmark`、

@@ -15,6 +15,10 @@
 
 | DL-007 | 覆蓋率提升:<74% 七檔拉至各 ≥74%(isabelle_export 66.3 / reparse_verifier 66.7 / rocq_export 67.5 / lsp_bridge 70.1 / lemmas 71.5 / variance_dropck_ub 71.2 / proof_resources 71.7) | 品質基建 | done | M | llvm-cov 逐檔 ≥74%;全量門禁綠 | 本地 llvm-cov:isabelle 100/reparse 88.2/rocq 75.7/lsp 99.3/lemmas 82.0/variance 98.4/proof_resources 99.7;全庫 84.0%;lib +23 測試;fmt/clippy(0 warn)/test 200/200/dev_loop 0 違規;CI run 33999567428 全綠(lcov 複核:isabelle 100/reparse 88.0/rocq 76.6/lsp 99.3/lemmas 81.9/variance 98.4/proof_resources 100;全庫 84.62%) |
 | DL-008 | bin 下沉第 2 批(圖鑑 D-2 續):cl0r0 九律自証引擎 + fuzz 屬性套件引擎下沉 lib 並補單測 | 品質基建 | done | M | 下沉函數有單測;兩 bin 行數各 −40%;全量門禁綠 | 新 lib fuzz_engine.rs(704 行,8 單測);bin/fuzz.rs 423→44(−89.6%)、bin/cl0r0.rs 265→155(−41.5%),兩 bin 實跑退出碼 0;下沉時修復潛伏投影 bug(初始紅邊 7→5 步→0);CI run 33999567428 全綠 |
+| DL-009 | 專有化法律地基(產品化第一步):LICENSE 改專有 EULA(撤銷 Cargo.toml MIT 標示)、THIRD_PARTY_NOTICES、全部 .rs 檔頭版權聲明 | 產品化 | done | S | Cargo.toml 不再標 MIT;LICENSE+NOTICES 入 repo;67 個 .rs 檔頭全有聲明;門禁全綠 | Cargo.toml license="MIT"→license-file="LICENSE";專有 LICENSE(DRAFT 待律師審+版權人名回填)入 repo;THIRD_PARTY_NOTICES(運行時零依賴聲明+工具鏈清單)入 repo;70 個 .rs 檔頭加版權聲明;dev_loop 合法隊增「產品化」(章程同步四隊);fmt/clippy 0/test 200 全綠;[COPYRIGHT HOLDER] placeholder 待產品負責人回填 |
+| DL-010 | workspace 5-crate 重構(計畫先行:WORKSPACE_PLAN.md 定案映射與依賴方向,獲產品負責人確認後方動碼) | 產品化 | building | L | 依賴方向編譯器強制;200 測試全綠;CI 綠;Atlas/文檔同步 | 計畫樹 WORKSPACE_PLAN.md 定案:51 模組映射 C1 syntax(9)/C2 mir(3)/C3 ars(23)/C4 cert(5)/C5 facade(11+bins);依賴矩陣實測無環;5 粘連點對策(K1 巨集/K2 cpf_cert/K3 patch_engine/K4 testkit/K5 路徑替換);待產品負責人確認映射後動碼 |
+| DL-011 | .wasi 跨平台打包 PoC —— 產品負責人指示:押後至 beta 版本鎖定時再決定 | 產品化 | parked | M | (凍結中;解凍權在產品負責人) | 2026-09-06 產品負責人凍結 |
+| DL-012 | 內部規格文書包(data room):架構/介面規格/證書格式對接/版本紀錄/質量証據匯編;依賴 DL-010 定案後執行以免重寫 | 產品化 | proposed | M | 文書包可獨立成冊交第三方審閱 | — |
 
 ## 凍結規則(章程 §4)
 

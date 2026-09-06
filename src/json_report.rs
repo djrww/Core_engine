@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! # 結構化完整 JSON 錯誤診斷報告與自動修復管線 (Full Structured JSON Error Report & Automated Repair Engine)
 //!
 //! 提供工業級機器可讀的 JSON 錯誤報告生成器、序列化/反序列化器與全自動修復閉環：

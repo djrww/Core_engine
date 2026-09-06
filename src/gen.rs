@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! 屬性測試的輸入宇宙(§7.3 定律 × 載體矩陣的「窮舉 / 抽樣」輸入來源)。
 //!
 //! 兩類輸入:

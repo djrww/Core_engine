@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §1.2 — 位址映象 σ : V → ℤ×ℤ ,σ(v) = [a, b) 為源碼字節區間(半開)。
 //! 半開區間是全部定律的幾何基石:連續性公理、L5 嵌套定理、編輯位移函數
 //! 都建立在「[a,b)」之上。

@@ -3,7 +3,7 @@ name = "cl0r0"
 version = "0.2.0"
 edition = "2021"
 description = "CL0/R0 dual carrier: surface syntax trees, nine laws (L1-L9) extended to 18 formal lemmas (L1-L18), decreasing diagrams, mechanical self-verification"
-license = "MIT"
+license-file = "LICENSE"
 
 [lib]
 name = "cl0r0"

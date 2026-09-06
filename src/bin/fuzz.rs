@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! fuzz —— 屬性測試主程序(確定性種子,可重現)。
 //!
 //! DL-008:套件引擎已下沉 `cl0r0::fuzz_engine`(可單測);本 bin 只剩

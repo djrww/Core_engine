@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! tests/sota_verification.rs
 //!
 //! 综合集成测试套件：覆盖 Decreasing Diagrams、Newman 快速通道 (SN ∧ WCR ⇒ CR)、

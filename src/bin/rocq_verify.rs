@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! rocq_verify —— Rocq 9.2 形式化證明導出與微內核機械核檢主程序。
 //!
 //! 審計 F-01/F-12 修復:

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! cl0r0_lsp —— 獨立 Language Server Protocol (LSP) 二進制服務進程。
 //!
 //! 通過 stdio JSON-RPC 2.0 協議與 VS Code、Rust-Rover、Neovim 等 IDE 通信，

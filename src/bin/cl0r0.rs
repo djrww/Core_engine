@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! cl0r0 —— 演示程序:CL0 載體上的九律檢查 + 幾何/重寫演示 + R₀ 接線預備。
 //!
 //! DL-008:樹公理檢查、L7b 迭代淨化、修剪計劃已下沉 `cl0r0::fuzz_engine`

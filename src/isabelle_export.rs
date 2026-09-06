@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §6.5 Isabelle/HOL 風格形式化理論草稿導出器(Isabelle-flavored Theory Exporter)。
 //!
 //! 【規格聲明 — 審計 F-04 止損】本導出器生成的是 Isabelle/HOL **風格的理論

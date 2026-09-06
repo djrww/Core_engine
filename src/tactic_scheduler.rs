@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §6.4 Tactic Scheduler + ARI-COPS 策略调度器与 CoCo 分析器对拍层。
 //!
 //! 启发式策略组合 (Grackle-CSI 风格 Portfolio):

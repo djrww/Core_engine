@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! cl0r0 —— 雙載體(CL0 定律載體 + R₀ 實用載體)的機械自証代碼庫。
 //!
 //! 六層基礎 → 九條定律(L1–L9)→ 18 大形式化引理(L1–L18)→ 雙載體規格(§7)

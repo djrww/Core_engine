@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §7.4 Rust 官方 Polonius 借用檢查器 Datalog 事實層雙向橋接與原生定點求解器 (Polonius Datalog Fixpoint Solver)。
 //!
 //! 對齊官方 `-Zpolonius` 核心 Datalog 關係規則：

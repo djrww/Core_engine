@@ -1,0 +1,78 @@
+PROPRIETARY AND CONFIDENTIAL — INTERNAL DRAFT PENDING LEGAL REVIEW
+本檔為內部草稿,未經律師審核前不得對外簽署或展示。
+版權持有人名稱以「[COPYRIGHT HOLDER]」暫位,公司註冊後回填。
+
+================================================================================
+
+CL0/R0 CONFLUENCE ENGINE — PROPRIETARY SOURCE CODE LICENSE AGREEMENT
+
+Copyright (c) 2026 [COPYRIGHT HOLDER]. All Rights Reserved.
+
+1. DEFINITIONS
+
+   "Software" means the CL0/R0 confluence engine, including its source code,
+   object code, binaries, documentation, certificates, test suites, and all
+   associated materials, in whole or in part.
+
+   "Licensor" means [COPYRIGHT HOLDER], the sole and exclusive owner of all
+   rights, title, and interest in and to the Software.
+
+   "Authorized User" means any person or entity that has received prior written
+   authorization (a "License Grant") from the Licensor to use the Software.
+
+2. OWNERSHIP
+
+   The Software is the exclusive property of the Licensor. All intellectual
+   property rights — including copyright, trade secrets, patents, patent
+   applications, trademarks, and know-how — in and to the Software are and
+   shall remain the sole and exclusive property of the Licensor.
+
+3. NO LICENSE BY DEFAULT
+
+   No rights are granted to any party by possession, receipt, inspection, or
+   download of the Software. ALL RIGHTS ARE RESERVED. Any use of the Software
+   requires a separate written License Grant signed by the Licensor.
+
+4. PROHIBITED CONDUCT
+
+   Unless expressly permitted by a License Grant, no person or entity may:
+
+   (a) copy, reproduce, or distribute the Software, in whole or in part;
+   (b) modify, adapt, translate, or create derivative works of the Software;
+   (c) reverse engineer, decompile, disassemble, or attempt to derive the
+       source code from any binary or bytecode form of the Software;
+   (d) remove, alter, or obscure any copyright notice, proprietary marking,
+       or disclaimer contained in or on the Software;
+   (e) sell, sublicense, lease, rent, pledge, or otherwise transfer any rights
+       in or to the Software;
+   (f) use the Software to develop a competing product or service.
+
+5. DEVELOPMENT RECORDS
+
+   The Software was developed with a documented, human-directed development
+   loop (version-controlled commit history, kanban records, and verification
+   logs). These records are incorporated by reference as evidence of
+   authorship and ownership.
+
+6. TERMINATION
+
+   Any breach of this Agreement terminates all rights granted, if any,
+   immediately and automatically, without prejudice to the Licensor's rights
+   to seek injunctive relief and damages.
+
+7. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED. THE LICENSOR DISCLAIMS ALL WARRANTIES, INCLUDING MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+8. GOVERNING LAW
+
+   This Agreement shall be governed by the laws of [JURISDICTION — 待定],
+   without regard to conflict-of-law principles.
+
+================================================================================
+
+聲明(中文摘要,僅供內部參考,以英文主文為準):
+本軟件為版權持有人之專有機密財產。任何人未取得書面授權,不得複製、修改、
+分發或逆向工程本軟件。一切知識產權歸版權持有人所有。

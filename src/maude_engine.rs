@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! # Maude 重寫邏輯引擎 (Maude Rewriting Logic System Engine)
 //!
 //! 參考文獻:

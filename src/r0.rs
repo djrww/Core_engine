@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! R₀ —— 實用載體(報告 §7.2 / 附錄 B)。
 //!
 //! R₀ 是 Rust 的刻意子集,覆蓋 judge/borrow 實際需要的現場:

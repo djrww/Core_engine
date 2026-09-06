@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! # Rocq 9.2 形式化證明導出與機械自証引擎 (Rocq 9.2 Formal Theory Exporter & Verifier)
 //!
 //! 支持將 CL0 / R₀ 雙載體系統、18 大形式化引理、van Oostrom 遞減圖與 Newman 快速通道

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! # Creusot (Why3 / Pearlite) 演繹驗證與預言變量理論導出器 (Creusot Deductive Verification & Prophecy Exporter)
 //!
 //! 提供將 CL0 / R₀ 借用系統、18 大形式化引理、OOPSLA 2025 模組化契約與 Reborrow 鏈

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! dev_prover —— 開發階段引理取証與形式化証物提取流水線
 //!
 //! 在開發期一鍵調度四大取証工具鏈：

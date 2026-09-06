@@ -1,3 +1,5 @@
+// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §4.7 AST 节点 Span 与事实层区间 Interval 的双向无损单子映射 (Bijective Span Monad)。
 //!
 //! 确保几何区间的修剪 (Shorten) 能够逆向合成为合法的 CST Delta 补丁，保持 L1/L6。
