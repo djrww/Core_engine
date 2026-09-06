@@ -4,7 +4,7 @@
 > **架構**: DL-010 起 workspace 五 crate:C1 cl0r0-syntax(9 模組)/C2 cl0r0-mir(3)/C3 cl0r0-ars(22)/C4 cl0r0-cert(6)/C5 cl0r0 facade(10 lib 模組+17 bins);依賴方向 C5→C4→C3→C2→C1 由編譯器強制;對外 API `cl0r0::X` 路徑不變。
 > **範圍**: 50 個 lib 模組 + 17 個 bin = **67 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
 > **覆蓋率口徑**: CI run `33999567428`(commit `7879c67`,DL-007/008 後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 84.62%**(門檻 72)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
-> **測試**: `cargo test --all-targets` = **200/200 通過**(lib 157 + bins/integration 43;DL-007 補測 +23、DL-008 fuzz_engine +8)。
+> **測試**: `cargo test --workspace --all-targets` = **200/200 通過**(facade lib 141 + 子 crate 16+57 測試隨模組走 + bins/integration 43;DL-010 起 workspace 口徑)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
 
 ---
