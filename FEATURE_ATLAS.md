@@ -134,7 +134,7 @@
 | **二·巨集層**(語法擴展) | 巨集語義之可執行模型與真巨集 | token_tree(9)、macro_lab(10)、bin macro_lab(55) | 3 |
 | **三·借用與類型語義層** | 借用組合、契約、變異性 | borrow_model(11)、mir(19)、modular_contracts(20)、variance_dropck_ub(21)、polonius_bridge(22) | 5 |
 | **四·重寫與合流層**(語義核心) | 終止、合流、正規形 | rep(12)、rep_dd(13)、dd_checker(14)、rule_labeling(15)、l9newman(16)、bin dd_verify(56)、bin l9newman(57)、maude_engine(35) | 8 |
-| **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器、第三方消費 | lemmas(23)、cpf_cert(24)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(58)、bin creusot_verify(59)、bin cert_factory(60)、bin dev_prover(66) | 12 |
+| **五·證書與證明層**(形式化背書) | 證書載體、引理、外部證明器、第三方消費 | lemmas(23)、cpf_cert(24)、cpf_import(51)、ari_export(25)、isabelle_export(26)、rocq_export(27)、creusot_export(28)、proof_resources(29)、tactics(30)、bin rocq_verify(58)、bin creusot_verify(59)、bin cert_factory(60)、bin dev_prover(66)、bin cpf_check(69) | 14 |
 | **六·實用載體與降階層** | R₀ 子集與語義降階 | r0(17)、r0_lower(18)、rustc_json(42) | 3 |
 | **七·演算法基建層** | 合一、共享、索引 | unification(32)、dag_term(33)、discrimination_tree(34) | 3 |
 | **八·測試、差分與工程運維層** | 屬性測試、差分、診斷、流水線 | gen(36)、shrink(37)、differential_checker(38)、lemma_stress_generator(39)、json_report(40)、lsp_bridge(41)、tool_runner(43)、patch_engine(44)、pipeline_synthesis(45)、cert_generator_factory(46)、testkit(47)、reparse_verifier(48)、tactic_scheduler(31)、bin cl0r0(52)、bin verify_all(53)、bin ci_verify(54)、bin coco_benchmark(61)、bin fuzz(62)、bin fuzz_daemon(63)、bin lemma_stress_coverage(64)、bin pipeline_runner(65)、bin lsp_server(67)、bin dev_loop(68)、selfcheck(49) | 24 |
