@@ -38,44 +38,27 @@
 //!   * `differential_checker`  : 跨引擎語意差分測試、黃金對賬與 DDMin 自動收斂器 (§9.2)
 
 // C1 語法層(DL-010 下沉):路徑 `cl0r0::X` 保持不變 —— 單一對外 API 原則
-pub use cl0r0_syntax::{ast, diff_tree, edit, gen, lex, parse, span, token_tree, tree};
+pub use cl0r0_ars::{
+    borrow_model, cpf_cert, dag_term, dd_checker, discrimination_tree, l9newman, macro_lab,
+    maude_engine, patch_engine, polonius_bridge, r0, r0_lower, rep, rep_dd, reparse_verifier,
+    rule_labeling, shrink, span_monad, tactic_scheduler, tactics, testkit, unification,
+};
 pub use cl0r0_mir::{mir, modular_contracts, variance_dropck_ub};
+pub use cl0r0_syntax::{ast, diff_tree, edit, gen, lex, parse, span, token_tree, tree};
 
 pub mod ari_export;
-pub mod borrow_model;
 pub mod cert_generator_factory;
-pub mod cpf_cert;
 pub mod creusot_export;
-pub mod dag_term;
-pub mod dd_checker;
 pub mod differential_checker;
-pub mod discrimination_tree;
 pub mod fuzz_engine;
 pub mod isabelle_export;
 pub mod json_report;
-pub mod l9newman;
 pub mod lemma_stress_generator;
 pub mod lemmas;
 pub mod lsp_bridge;
-pub mod macro_lab;
-pub mod maude_engine;
-pub mod patch_engine;
 pub mod pipeline_synthesis;
-pub mod polonius_bridge;
 pub mod proof_resources;
-pub mod r0;
-pub mod r0_lower;
-pub mod rep;
-pub mod rep_dd;
-pub mod reparse_verifier;
 pub mod rocq_export;
-pub mod rule_labeling;
 pub mod rustc_json;
 pub mod selfcheck;
-pub mod shrink;
-pub mod span_monad;
-pub mod tactic_scheduler;
-pub mod tactics;
-pub mod testkit;
 pub mod tool_runner;
-pub mod unification;

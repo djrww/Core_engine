@@ -1,0 +1,13 @@
+[package]
+name = "cl0r0-ars"
+version = "0.2.0"
+edition = "2021"
+description = "CL0/R0 abstract rewriting / confluence core: ARS, DD, Newman, KB, unification, Polonius bridge, macro lab"
+license-file = "LICENSE"
+
+[lib]
+name = "cl0r0_ars"
+path = "src/lib.rs"
+
+[dependencies]
+cl0r0-syntax = { path = "../cl0r0-syntax" }
