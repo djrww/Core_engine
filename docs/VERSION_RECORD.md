@@ -29,8 +29,8 @@
 | DL-010 | workspace 五 crate 重構 | done | 870a24e;CI 34008381873 |
 | DL-011 | .wasi 跨平台打包 PoC | **parked** | 產品負責人凍結,待 beta 鎖版決定 |
 | DL-012 | 本文書包(data room) | done | f774a4f;CI 34025271472 |
-| DL-013 | Isabelle 導出升格(F-04 二階):sorry 顯式遺漏格式+structural_audit 結構良構機檢 | done | 本輪 commit;isabelle_export 覆蓋 100% |
-| DL-014 | bin 整合測試(bins_smoke 17 項,零第三方) | done | 本輪 commit;bin 覆蓋 47–100%,全庫 90.13%(本地) |
+| DL-013 | Isabelle 導出升格(F-04 二階):sorry 顯式遺漏格式+structural_audit 結構良構機檢 | done | 29bdfcd;CI 34027780280;isabelle_export 覆蓋 100% |
+| DL-014 | bin 整合測試(bins_smoke 17 項,零第三方) | done | 29bdfcd;CI 34027780280;bin 覆蓋 47–100%,全庫 90.87%(CI) |
 
 ## 3 · 質量指標演進
 

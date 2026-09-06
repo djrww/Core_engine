@@ -58,7 +58,7 @@ Cargo workspace 五 crate,依賴方向**單向、由編譯器強制**(不允許�
 
 | 指標 | 值 |
 |---|---|
-| workspace 行覆蓋率 | **90.13%**(本地 llvm-cov,門檻 72;CI 口徑回填 pending) |
+| workspace 行覆蓋率 | **90.87%**(CI lcov run 34027780280,門檻 72) |
 | 測試 | **218/218**(facade 141 + 子 crate 74 + bins/integration 60,含 bins_smoke 17) |
 | clippy | 0 warning(`-D warnings` 標準) |
 | 裸 unwrap(非測試碼) | 0 |
