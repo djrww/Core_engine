@@ -6,6 +6,14 @@ version = 4
 name = "cl0r0"
 version = "0.2.0"
 dependencies = [
+ "cl0r0-mir",
+ "cl0r0-syntax",
+]
+
+[[package]]
+name = "cl0r0-mir"
+version = "0.2.0"
+dependencies = [
  "cl0r0-syntax",
 ]
 

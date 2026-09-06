@@ -39,6 +39,7 @@
 
 // C1 語法層(DL-010 下沉):路徑 `cl0r0::X` 保持不變 —— 單一對外 API 原則
 pub use cl0r0_syntax::{ast, diff_tree, edit, gen, lex, parse, span, token_tree, tree};
+pub use cl0r0_mir::{mir, modular_contracts, variance_dropck_ub};
 
 pub mod ari_export;
 pub mod borrow_model;
@@ -58,8 +59,6 @@ pub mod lemmas;
 pub mod lsp_bridge;
 pub mod macro_lab;
 pub mod maude_engine;
-pub mod mir;
-pub mod modular_contracts;
 pub mod patch_engine;
 pub mod pipeline_synthesis;
 pub mod polonius_bridge;
@@ -80,4 +79,3 @@ pub mod tactics;
 pub mod testkit;
 pub mod tool_runner;
 pub mod unification;
-pub mod variance_dropck_ub;

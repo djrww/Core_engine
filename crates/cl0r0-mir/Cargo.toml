@@ -1,0 +1,13 @@
+[package]
+name = "cl0r0-mir"
+version = "0.2.0"
+edition = "2021"
+description = "CL0/R0 MIR layer: mir types, modular contracts, variance/dropck/UB oracle"
+license-file = "LICENSE"
+
+[lib]
+name = "cl0r0_mir"
+path = "src/lib.rs"
+
+[dependencies]
+cl0r0-syntax = { path = "../cl0r0-syntax" }

@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/cl0r0-syntax"]
+members = ["crates/cl0r0-syntax", "crates/cl0r0-mir"]
 
 [package]
 name = "cl0r0"
@@ -10,6 +10,7 @@ license-file = "LICENSE"
 
 [dependencies]
 cl0r0-syntax = { path = "crates/cl0r0-syntax" }
+cl0r0-mir = { path = "crates/cl0r0-mir" }
 
 [lib]
 name = "cl0r0"
