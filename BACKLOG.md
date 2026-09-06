@@ -23,7 +23,7 @@
 | DL-014 | bin 整合測試(零第三方):tests/bins_smoke.rs 以 CARGO_BIN_EXE_* 驅動 17 個 bin,斷言退出碼+特徵輸出,補量測空洞 | 品質基建 | done | M | 17 bin 各 ≥1 整合測試;llvm-cov bin 檔不再全 0%;全量門禁綠 | tests/bins_smoke.rs 17 測試(零第三方,CARGO_BIN_EXE_*;30s 超時保護;lsp 餵 LSP base protocol 真幀);bin 覆蓋 0%→47–100%(lsp_server 25.8→83.9);全庫 84.62→90.87%(CI lcov);218 測試;commit 29bdfcd;CI run 34027780280 全綠 |
 | DL-015 | Miri/Stacked Borrows 差分對齊:UB 預言機與 SB 規則情景對照表(機檢差分測試+分歧登記);本環境 miri 元件缺席(ADR 如實記錄) | 證明證書 | done | M | 情景表機檢全綠;分歧登記完整;門禁全綠 | SB_SCENARIOS 5 情景機檢一致;SB_DIVERGENCES 4 項分歧登記(SB-D1 行為機檢);+3 測試;ADR-015 記錄 miri 缺席+100% safe Rust;commit 6bf52f8;CI 34030229681 全綠(全庫 90.76%) |
 | DL-016 | 第三方 CPF 消費入口(D-2 續):cpf_import 解析+獨立複核(documented subset:DD/KB/正交),bin cpf_check;CeTA 完整互操作屬後續 | 證明證書 | done | M | 第三方樣本 Verified;篡改樣本 Rejected;不支援類型如實 Unsupported;門禁全綠 | crates/cl0r0-ars 新增 cpf_import(documented subset 四態判定;5 單測:第三方 DD Verified/環偏序 Rejected/未知類型 Unsupported/截斷+轉義+缺見證 Malformed/KB+正交 Verified);bin cpf_check(無參自演示 exit 0 實跑 ✓;退出碼 0/3/4/5/6);bins_smoke +1;227 測試/clippy 0/fmt ✓;commit 6bf52f8;CI 34030229681 全綠;插曲:首推 YAML 縮進失誤 34029365372 失敗(0 jobs),即修 8ea6ec1 轉綠——過程如實記錄 |
-| DL-017 | multi-edit 增量重析等價補全(L3/L4):批次多編輯(2–5 個,含相鄰/邊界)與逐編輯、全量解析三方等價屬性測試 | 品質基建 | verifying | M | 批次=逐個=全量 sexp 等價;隨機種子 30 輪;重用率>0;門禁全綠 | multi_edit_tests 6 測試:2/5 編輯批次等價+重用、逐步≡批次(座標平移)、邊界+相鄰、30 輪隨機 K=2..4 屬性、未觸及 item 確定性重用;等價全數成立(引擎批次語義本已正確,測試補証);233 測試/clippy 0;待 CI |
+| DL-017 | multi-edit 增量重析等價補全(L3/L4):批次多編輯(2–5 個,含相鄰/邊界)與逐編輯、全量解析三方等價屬性測試 | 品質基建 | done | M | 批次=逐個=全量 sexp 等價;隨機種子 30 輪;重用率>0;門禁全綠 | multi_edit_tests 6 測試:2/5 編輯批次等價+重用、逐步≡批次(座標平移)、邊界+相鄰、30 輪隨機 K=2..4 屬性、未觸及 item 確定性重用;等價全數成立(引擎批次語義本已正確,測試補証);233 測試/clippy 0;commit dc5768b;CI run 34030689328 全綠 |
 
 ## 凍結規則(章程 §4)
 
