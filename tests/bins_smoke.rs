@@ -143,6 +143,12 @@ fn bin_lemma_stress_full_invariants() {
 }
 
 #[test]
+fn bin_cpf_check_third_party_demo() {
+    // 無參數 = 內嵌第三方樣本獨立複核自演示
+    assert_bin(env!("CARGO_BIN_EXE_cpf_check"), &[], "獨立複核");
+}
+
+#[test]
 fn bin_dev_prover_evidence_conclusion() {
     assert_bin(env!("CARGO_BIN_EXE_dev_prover"), &[], "取証結論");
 }

@@ -21,6 +21,9 @@
 | DL-012 | 內部規格文書包(data room):架構/介面規格/證書格式對接/版本紀錄/質量証據匯編;依賴 DL-010 定案後執行以免重寫 | 產品化 | done | M | 文書包可獨立成冊交第三方審閱 | commit f774a4f;CI run 34025271472 全綠;docs/ 六檔:DATA_ROOM_INDEX/SPEC_ARCHITECTURE/SPEC_INTERFACE/SPEC_CERTIFICATES/VERSION_RECORD/QUALITY_EVIDENCE;200 測試/clippy 0/fmt ✓/dev_loop 0 違規 |
 | DL-013 | Isabelle 導出升格(F-04 第二階段):定理由註釋草案升為顯式 sorry 宣言(合法 Isabelle/HOL 語法+數據實錄定義)+結構良構機檢(structural_audit);完整 Isabelle 証明仍屬後續,如實申報 | 證明證書 | done | M | 定理陳述脫離註釋;sorry 計數=定理計數機檢;全量門禁綠 | 定理脫離註釋→顯式 sorry 宣言(僅標準庫,零 IsaFoR);structural_audit 嵌套註釋詞法機檢(捉出真實詞法坑:代碼區孤立 *));+1 測試;isabelle_export 覆蓋 100%;218 測試/clippy 0/fmt ✓;commit 29bdfcd;CI run 34027780280 全綠 |
 | DL-014 | bin 整合測試(零第三方):tests/bins_smoke.rs 以 CARGO_BIN_EXE_* 驅動 17 個 bin,斷言退出碼+特徵輸出,補量測空洞 | 品質基建 | done | M | 17 bin 各 ≥1 整合測試;llvm-cov bin 檔不再全 0%;全量門禁綠 | tests/bins_smoke.rs 17 測試(零第三方,CARGO_BIN_EXE_*;30s 超時保護;lsp 餵 LSP base protocol 真幀);bin 覆蓋 0%→47–100%(lsp_server 25.8→83.9);全庫 84.62→90.87%(CI lcov);218 測試;commit 29bdfcd;CI run 34027780280 全綠 |
+| DL-015 | Miri/Stacked Borrows 差分對齊:UB 預言機與 SB 規則情景對照表(機檢差分測試+分歧登記);本環境 miri 元件缺席(ADR 如實記錄) | 證明證書 | verifying | M | 情景表機檢全綠;分歧登記完整;門禁全綠 | SB_SCENARIOS 5 情景機檢一致;SB_DIVERGENCES 4 項分歧登記(SB-D1 行為機檢);+3 測試;ADR-015 記錄 miri 缺席+100% safe Rust;待全量門禁+CI |
+| DL-016 | 第三方 CPF 消費入口(D-2 續):cpf_import 解析+獨立複核(documented subset:DD/KB/正交),bin cpf_check;CeTA 完整互操作屬後續 | 證明證書 | verifying | M | 第三方樣本 Verified;篡改樣本 Rejected;不支援類型如實 Unsupported;門禁全綠 | crates/cl0r0-ars 新增 cpf_import(documented subset 四態判定;5 單測:第三方 DD Verified/環偏序 Rejected/未知類型 Unsupported/截斷+轉義+缺見證 Malformed/KB+正交 Verified);bin cpf_check(無參自演示 exit 0 實跑 ✓;退出碼 0/3/4/5/6);bins_smoke +1;227 測試/clippy 0/fmt ✓;待 CI |
+| DL-017 | multi-edit 增量重析等價補全(L3/L4):批次多編輯(2–5 個,含相鄰/邊界)與逐編輯、全量解析三方等價屬性測試 | 品質基建 | proposed | M | 批次=逐個=全量 sexp 等價;隨機種子 30 輪;重用率>0;門禁全綠 | — |
 
 ## 凍結規則(章程 §4)
 

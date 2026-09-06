@@ -84,7 +84,8 @@ jobs:
           cargo run --bin fuzz
           cargo run --bin lemma_stress_coverage
           cargo run --bin ci_verify
-          cargo run --bin rocq_verify
+          cargo run --bin cpf_check
+cargo run --bin rocq_verify
           cargo run --bin creusot_verify
           cargo run --bin dev_prover
 
@@ -119,7 +120,7 @@ jobs:
         run: |
           tag=${GITHUB_REF_NAME}
           tar czf "cl0r0-${tag}-x86_64-unknown-linux-gnu.tar.gz" \
-            -C target/release cl0r0 dev_loop l9newman dd_verify macro_lab verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify rocq_verify creusot_verify
+            -C target/release cl0r0 dev_loop l9newman dd_verify macro_lab verify_all pipeline_runner cert_factory coco_benchmark fuzz fuzz_daemon cl0r0_lsp lemma_stress_coverage ci_verify cpf_check rocq_verify creusot_verify
 
       - name: create or update GitHub Release
         env:

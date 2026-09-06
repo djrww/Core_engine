@@ -595,3 +595,143 @@ mod tests {
         assert_eq!(UbDiagnosticOracle::check_pointer_access(7, 1), None);
     }
 }
+
+// =========================================================================
+// DL-015:Stacked Borrows 差分對齊(情景對照表+分歧登記)
+// -------------------------------------------------------------------------
+// 本節將 UbDiagnosticOracle(簡化別名衝突模型)與 Stacked Borrows
+// (Jung et al., RustBelt 系論文之 Rust 記憶體模型)逐情景對照:
+// * `SB_SCENARIOS` —— 對齊情景(oracle 判定 ⇔ SB 參考判定一致),機檢;
+// * `SB_DIVERGENCES` —— 已知分歧登記(我哋模型簡化之處,如實申報);
+// * 本環境 `miri` 元件於 1.98.0 toolchain 不供應(rustup 如實報錯),
+//   故採「語義情景表差分」路線並以 ADR 記錄——待 miri 可用時可加跑。
+// 另:本引擎全庫 100% safe Rust(零 unsafe),自身執行由 rustc borrowck
+// 把關,Miri 主要增值在 unsafe 代碼——此點同時是 data room 賣點。
+// =========================================================================
+
+/// SB 對照情景:oracle 輸入 + SB 參考判定(依論文語義編碼)
+pub struct SbScenario {
+    pub name: &'static str,
+    pub is_write: bool,
+    pub has_active_unique: bool,
+    pub active_shared_readers: usize,
+    /// SB 參考判定:true = UB
+    pub sb_is_ub: bool,
+}
+
+/// 對齊情景:oracle 與 SB 判定必須一致
+pub const SB_SCENARIOS: &[SbScenario] = &[
+    SbScenario {
+        name: "共享引用存活下讀取",
+        is_write: false,
+        has_active_unique: false,
+        active_shared_readers: 2,
+        sb_is_ub: false,
+    },
+    SbScenario {
+        name: "Unique 在頂且零共享讀者時寫入",
+        is_write: true,
+        has_active_unique: true,
+        active_shared_readers: 0,
+        sb_is_ub: false,
+    },
+    SbScenario {
+        name: "共享讀者存活時寫入(讀寫衝突)",
+        is_write: true,
+        has_active_unique: true,
+        active_shared_readers: 1,
+        sb_is_ub: true,
+    },
+    SbScenario {
+        name: "缺乏 Unique 權限時寫入",
+        is_write: true,
+        has_active_unique: false,
+        active_shared_readers: 0,
+        sb_is_ub: true,
+    },
+    SbScenario {
+        name: "共享讀者存活且無 Unique 時寫入(雙重違反)",
+        is_write: true,
+        has_active_unique: false,
+        active_shared_readers: 3,
+        sb_is_ub: true,
+    },
+];
+
+/// 已知分歧登記(簡化模型邊界,如實申報;完整語義以 Miri/SB 論文為準)
+pub struct SbDivergence {
+    pub id: &'static str,
+    pub name: &'static str,
+    pub oracle_behavior: &'static str,
+    pub sb_behavior: &'static str,
+}
+
+pub const SB_DIVERGENCES: &[SbDivergence] = &[
+    SbDivergence {
+        id: "SB-D1",
+        name: "空棧讀取",
+        oracle_behavior: "讀取一律回 None(不追蹤授權棧空否)",
+        sb_behavior: "通過無授權標籤之指標讀取 = UB",
+    },
+    SbDivergence {
+        id: "SB-D2",
+        name: "標籤棧序/retag",
+        oracle_behavior: "扁平布爾(unique?/讀者數),不建模棧序與 retag",
+        sb_behavior: "完整標籤棧;retag 產生新標籤並收緊許可",
+    },
+    SbDivergence {
+        id: "SB-D3",
+        name: "兩階段借用",
+        oracle_behavior: "未建模(允許狀態簡化為 activation 後語義)",
+        sb_behavior: "Reserved(ReservedImm)狀態有專門語義",
+    },
+    SbDivergence {
+        id: "SB-D4",
+        name: "寫入彈棧失效傳播",
+        oracle_behavior: "以 active_shared_readers 計數近似(計數準確時等價)",
+        sb_behavior: "寫入彈走上方 SharedRead 並使其永久失效",
+    },
+];
+
+#[cfg(test)]
+mod sb_differential {
+    use super::*;
+
+    /// 對齊情景表:oracle 判定與 SB 參考判定逐行一致
+    #[test]
+    fn aligned_scenarios_table_consistent() {
+        assert!(!SB_SCENARIOS.is_empty(), "對齊情景表不應為空");
+        for s in SB_SCENARIOS {
+            let oracle_ub = UbDiagnosticOracle::check_stacked_borrows_access(
+                s.is_write,
+                s.has_active_unique,
+                s.active_shared_readers,
+            )
+            .is_some();
+            assert_eq!(
+                oracle_ub, s.sb_is_ub,
+                "情景「{}」:oracle={oracle_ub} 但 SB 參考={}",
+                s.name, s.sb_is_ub
+            );
+        }
+    }
+
+    /// 分歧登記:每一項均具名、雙邊描述齊全,且 id 唯一
+    #[test]
+    fn divergences_registered_completely() {
+        assert!(SB_DIVERGENCES.len() >= 4, "已知分歧應全數登記");
+        let mut seen = std::collections::HashSet::new();
+        for d in SB_DIVERGENCES {
+            assert!(!d.name.is_empty(), "{} 名稱不應為空", d.id);
+            assert!(!d.oracle_behavior.is_empty() && !d.sb_behavior.is_empty());
+            assert!(seen.insert(d.id), "分歧 id {} 重複", d.id);
+        }
+    }
+
+    /// 分歧情景 SB-D1(空棧讀取)確實如登記所言行為:oracle 對讀取回 None
+    #[test]
+    fn divergence_sb_d1_behavior_as_declared() {
+        let oracle = UbDiagnosticOracle::check_stacked_borrows_access(false, false, 0);
+        assert!(oracle.is_none(), "SB-D1:oracle 對空棧讀取應回 None(如登記)");
+    }
+}

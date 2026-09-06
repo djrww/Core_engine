@@ -39,9 +39,10 @@
 
 // C1 語法層(DL-010 下沉):路徑 `cl0r0::X` 保持不變 —— 單一對外 API 原則
 pub use cl0r0_ars::{
-    borrow_model, cpf_cert, dag_term, dd_checker, discrimination_tree, l9newman, macro_lab,
-    maude_engine, patch_engine, polonius_bridge, r0, r0_lower, rep, rep_dd, reparse_verifier,
-    rule_labeling, shrink, span_monad, tactic_scheduler, tactics, testkit, unification,
+    borrow_model, cpf_cert, cpf_import, dag_term, dd_checker, discrimination_tree, l9newman,
+    macro_lab, maude_engine, patch_engine, polonius_bridge, r0, r0_lower, rep, rep_dd,
+    reparse_verifier, rule_labeling, shrink, span_monad, tactic_scheduler, tactics, testkit,
+    unification,
 };
 pub use cl0r0_cert::{
     ari_export, creusot_export, isabelle_export, proof_resources, rocq_export, tool_runner,

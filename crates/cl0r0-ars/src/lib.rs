@@ -9,6 +9,7 @@ pub use cl0r0_syntax::{ast, edit, gen, lex, parse, span, token_tree};
 
 pub mod borrow_model;
 pub mod cpf_cert;
+pub mod cpf_import;
 pub mod dag_term;
 pub mod dd_checker;
 pub mod discrimination_tree;

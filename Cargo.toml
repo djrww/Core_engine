@@ -79,6 +79,10 @@ name = "creusot_verify"
 path = "src/bin/creusot_verify.rs"
 
 [[bin]]
+name = "cpf_check"
+path = "src/bin/cpf_check.rs"
+
+[[bin]]
 name = "dev_prover"
 path = "src/bin/dev_prover.rs"
 

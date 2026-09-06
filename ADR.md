@@ -1,4 +1,5 @@
 # Core_engine (`cl0r0`) 架構決策記錄與開發事項流水簿 (Architecture Decision Records & Logbook)
+| ADR-015 | 2026-09-06 | 執行者/agent | DL-015:Miri 差分採「語義情景表」路線(miri 元件於 1.98.0 toolchain 不供應,rustup 報錯如實記錄);引擎 100% safe Rust,自身由 borrowck 把關 | 採納 | variance_dropck_ub::SB_SCENARIOS/SB_DIVERGENCES;待 miri 可用時補真跑 |
 
 ---
 

@@ -51,9 +51,23 @@
 - UB 預言機為簡化模型(Stacked Borrows 子集),與 Miri 完整模型嘅
   系統化差分對齊屬後續工作。
 
-## 5 · 與國際基準對接
+## 5 · 第三方消費入口(獨立複核者定位)
+
+DL-016 起,引擎具備**消費**第三方 CPF 証書嘅能力(`cpf_import` + bin `cpf_check`):
+解析 documented subset(DD/KB/正交)→ **不信任來源宣稱,只重放見證** →
+`cpf_cert::verify` 獨立複核 → 四態判定(Verified/Rejected/Unsupported/Malformed)。
+誠實邊界:CeTA 完整 CPF 2.x 互操作屬後續;識別子子集不消費實體轉義。
+
+## 6 · Miri/Stacked Borrows 對齊(DL-015)
+
+UB 預言機與 Stacked Borrows(Jung et al.)以**情景對照表**差分:
+5 個對齊情景機檢一致;4 項已知分歧(SB-D1 空棧讀取/D2 標籤棧序/D3 兩階段/
+D4 彈棧失效傳播)如實登記於 `variance_dropck_ub::SB_DIVERGENCES`。
+本環境 miri 元件缺席(ADR-015);引擎 100% safe Rust(零 unsafe)。
+
+## 7 · 與國際基準對接
 
 - **CoCo(Confluence Competition)**:`coco_benchmark` bin 已留對接位;
-  消費第三方 CPF/TPFA 輸入做獨立複核係下一步(現階段自產自銷屬已知弱點,
-  如實申報);
+  DL-016 起 `cpf_check` 已能獨立複核第三方 CPF(documented subset)——
+  「自產自銷」弱點已開始收窄;完整 CeTA 互操作屬後續;
 - **TPFA**: Termination and Complexity 系證書格式,對接屬路線圖。
