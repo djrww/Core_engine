@@ -18,7 +18,7 @@
 | DL-009 | 專有化法律地基(產品化第一步):LICENSE 改專有 EULA(撤銷 Cargo.toml MIT 標示)、THIRD_PARTY_NOTICES、全部 .rs 檔頭版權聲明 | 產品化 | done | S | Cargo.toml 不再標 MIT;LICENSE+NOTICES 入 repo;67 個 .rs 檔頭全有聲明;門禁全綠 | Cargo.toml license="MIT"→license-file="LICENSE";專有 LICENSE(DRAFT 待律師審+版權人名回填)入 repo;THIRD_PARTY_NOTICES(運行時零依賴聲明+工具鏈清單)入 repo;70 個 .rs 檔頭加版權聲明;dev_loop 合法隊增「產品化」(章程同步四隊);fmt/clippy 0/test 200 全綠;[COPYRIGHT HOLDER] placeholder 待產品負責人回填 |
 | DL-010 | workspace 5-crate 重構(計畫先行:WORKSPACE_PLAN.md 定案映射與依賴方向,獲產品負責人確認後方動碼) | 產品化 | done | L | 依賴方向編譯器強制;200 測試全綠;CI 綠;Atlas/文檔同步 | 計畫樹 WORKSPACE_PLAN.md 定案:51 模組映射 C1 syntax(9)/C2 mir(3)/C3 ars(23)/C4 cert(5)/C5 facade(11+bins);依賴矩陣實測無環;5 粘連點對策(K1 巨集/K2 cpf_cert/K3 patch_engine/K4 testkit/K5 路徑替換);產品負責人已批准(2026-09-06);C1..C5 全數遷移完畢:crates/cl0r0-{syntax,mir,ars,cert}+root facade;workspace 200 測試綠;clippy --workspace 0 warning;5 bin 實跑 ✓;ci.yml clippy/test 補 --workspace;CI run 34008381873 全綠(workspace lcov 覆蓋率 84.62%≥72);5 commit 分步遷移(33af21c/5725184/6f6469b 系列) |
 | DL-011 | .wasi 跨平台打包 PoC —— 產品負責人指示:押後至 beta 版本鎖定時再決定 | 產品化 | parked | M | (凍結中;解凍權在產品負責人) | 2026-09-06 產品負責人凍結 |
-| DL-012 | 內部規格文書包(data room):架構/介面規格/證書格式對接/版本紀錄/質量証據匯編;依賴 DL-010 定案後執行以免重寫 | 產品化 | verifying | M | 文書包可獨立成冊交第三方審閱 | docs/ 六檔成冊:DATA_ROOM_INDEX/SPEC_ARCHITECTURE/SPEC_INTERFACE/SPEC_CERTIFICATES/VERSION_RECORD/QUALITY_EVIDENCE;門禁全綠(200 測試/clippy 0/fmt/dev_loop 0 違規);待 CI 綠收官 |
+| DL-012 | 內部規格文書包(data room):架構/介面規格/證書格式對接/版本紀錄/質量証據匯編;依賴 DL-010 定案後執行以免重寫 | 產品化 | done | M | 文書包可獨立成冊交第三方審閱 | commit f774a4f;CI run 34025271472 全綠;docs/ 六檔:DATA_ROOM_INDEX/SPEC_ARCHITECTURE/SPEC_INTERFACE/SPEC_CERTIFICATES/VERSION_RECORD/QUALITY_EVIDENCE;200 測試/clippy 0/fmt ✓/dev_loop 0 違規 |
 
 ## 凍結規則(章程 §4)
 
