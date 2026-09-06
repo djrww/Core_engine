@@ -85,7 +85,7 @@ jobs:
           cargo run --bin lemma_stress_coverage
           cargo run --bin ci_verify
           cargo run --bin cpf_check
-cargo run --bin rocq_verify
+          cargo run --bin rocq_verify
           cargo run --bin creusot_verify
           cargo run --bin dev_prover
 
