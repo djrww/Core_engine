@@ -374,10 +374,12 @@ fn test_isabelle_theory_exporter() {
     );
     let thy = cl0r0::isabelle_export::IsabelleExporter::export_theory("CL0_Theory", &cert);
     assert!(thy.contains("theory CL0_Theory"));
-    assert!(thy.contains("IsaFoR.Decreasing_Diagrams"));
+    assert!(thy.contains("imports Main"));
+    assert!(!thy.contains("IsaFoR"));
     assert!(thy.contains("datatype cl0_fun"));
-    // 定理陳述以註釋記錄並標明機械核驗權威(Isabelle 完整證明待形式化)
-    assert!(thy.contains("theorem cl0_confluence"));
+    // F-04 第二階段:定理為顯式 sorry 宣言(遺漏可點算),標明機械核驗權威
+    assert!(thy.contains("theorem kb_peaks_joinable_witnessed"));
+    assert!(cl0r0::isabelle_export::structural_audit(&thy, "CL0_Theory").ok());
     assert!(thy.contains("cpf_cert::verify"));
     assert!(
         !thy.contains("[["),

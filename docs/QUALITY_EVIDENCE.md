@@ -7,8 +7,8 @@
 
 | 門禁 | 結果 | 複核命令 |
 |------|------|----------|
-| 單元/整合測試 | **200/200 通過** | `cargo test --workspace --all-targets` |
-| 行覆蓋率 | **84.62%**(門檻 72) | CI `cargo llvm-cov --workspace --fail-under-lines 72` |
+| 單元/整合測試 | **218/218 通過**(含 bins_smoke 17 項 bin 整合測試) | `cargo test --workspace --all-targets` |
+| 行覆蓋率 | **90.13%**(本地 llvm-cov;門檻 72) | CI `cargo llvm-cov --workspace --fail-under-lines 72` |
 | clippy | **0 warning** | `cargo clippy --workspace --all-targets -- -D warnings` |
 | rustfmt | 通過 | `cargo fmt --all -- --check` |
 | 看板不變式 | **0 違規** | `cargo run --bin dev_loop` |
@@ -43,8 +43,8 @@
   variance_dropck_ub **98.4**、lsp_bridge **99.3**、reparse_verifier **88.0**、
   lemmas **81.9**、rocq_export **76.6**(CI lcov 口徑);
 - 全庫最低檔 ≥72 門檻之上;無 0% lib 模組;
-- 17 個 bin 顯示 0% 屬**量測空洞**(llvm-cov 只計儀器化測試;CI 每輪實跑
-  全部 bin 且以退出碼把關)——DL-014 議程補真實量測。
+- 17 個 bin 已有整合測試驅動(DL-014 bins_smoke,零第三方依賴,CARGO_BIN_EXE_* 機制),
+  覆蓋 47–100%,量測空洞收窄;rocq_verify 47% 為本機 Rocq 分支缺席(CI 有 Rocq)。
 
 ## 5 · 質量不變式(寫入 CI,違者即斷)
 

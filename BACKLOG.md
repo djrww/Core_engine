@@ -19,6 +19,8 @@
 | DL-010 | workspace 5-crate 重構(計畫先行:WORKSPACE_PLAN.md 定案映射與依賴方向,獲產品負責人確認後方動碼) | 產品化 | done | L | 依賴方向編譯器強制;200 測試全綠;CI 綠;Atlas/文檔同步 | 計畫樹 WORKSPACE_PLAN.md 定案:51 模組映射 C1 syntax(9)/C2 mir(3)/C3 ars(23)/C4 cert(5)/C5 facade(11+bins);依賴矩陣實測無環;5 粘連點對策(K1 巨集/K2 cpf_cert/K3 patch_engine/K4 testkit/K5 路徑替換);產品負責人已批准(2026-09-06);C1..C5 全數遷移完畢:crates/cl0r0-{syntax,mir,ars,cert}+root facade;workspace 200 測試綠;clippy --workspace 0 warning;5 bin 實跑 ✓;ci.yml clippy/test 補 --workspace;CI run 34008381873 全綠(workspace lcov 覆蓋率 84.62%≥72);5 commit 分步遷移(33af21c/5725184/6f6469b 系列) |
 | DL-011 | .wasi 跨平台打包 PoC —— 產品負責人指示:押後至 beta 版本鎖定時再決定 | 產品化 | parked | M | (凍結中;解凍權在產品負責人) | 2026-09-06 產品負責人凍結 |
 | DL-012 | 內部規格文書包(data room):架構/介面規格/證書格式對接/版本紀錄/質量証據匯編;依賴 DL-010 定案後執行以免重寫 | 產品化 | done | M | 文書包可獨立成冊交第三方審閱 | commit f774a4f;CI run 34025271472 全綠;docs/ 六檔:DATA_ROOM_INDEX/SPEC_ARCHITECTURE/SPEC_INTERFACE/SPEC_CERTIFICATES/VERSION_RECORD/QUALITY_EVIDENCE;200 測試/clippy 0/fmt ✓/dev_loop 0 違規 |
+| DL-013 | Isabelle 導出升格(F-04 第二階段):定理由註釋草案升為顯式 sorry 宣言(合法 Isabelle/HOL 語法+數據實錄定義)+結構良構機檢(structural_audit);完整 Isabelle 証明仍屬後續,如實申報 | 證明證書 | verifying | M | 定理陳述脫離註釋;sorry 計數=定理計數機檢;全量門禁綠 | 定理脫離註釋→顯式 sorry 宣言(僅標準庫,零 IsaFoR);structural_audit 嵌套註釋詞法機檢(捉出真實詞法坑:代碼區孤立 *));+1 測試;isabelle_export 覆蓋 100%;218 測試/clippy 0/fmt ✓;待 CI 綠收官 |
+| DL-014 | bin 整合測試(零第三方):tests/bins_smoke.rs 以 CARGO_BIN_EXE_* 驅動 17 個 bin,斷言退出碼+特徵輸出,補量測空洞 | 品質基建 | verifying | M | 17 bin 各 ≥1 整合測試;llvm-cov bin 檔不再全 0%;全量門禁綠 | tests/bins_smoke.rs 17 測試(零第三方,CARGO_BIN_EXE_*;30s 超時保護;lsp 餵 LSP base protocol 真幀);bin 覆蓋 0%→47–100%(lsp_server 25.8→83.9);全庫 84.62→90.13%(本地);218 測試;待 CI 綠收官 |
 
 ## 凍結規則(章程 §4)
 

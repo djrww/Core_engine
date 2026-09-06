@@ -10,7 +10,7 @@
 |---|---|---|---|
 | **T1** | 機內自証 | 引擎對自身執行機械檢查:18 引理、10 門禁、種子確定性屬性套件 | ✅ 全 Proven(CI 每輪) |
 | **T2** | 外部核檢 | 第三方證明器獨立核驗:Rocq(rocqchk 微內核)、Creusot/Why3/Z3(VC 消解) | ✅ CI 真裝真跑,0 SKIP |
-| **T3** | 草案導出 | Isabelle 理論導出(定理以註釋陳述,完整 Isabelle 證明待形式化) | ⚠️ 誠實標注 DRAFT |
+| **T3** | 草案導出 | Isabelle 理論導出(F-04 二階:定理=合法 Isabelle/HOL 語法+**顯式 sorry** 遺漏標記,遺漏可機器點算;僅依賴標準庫;structural_audit 結構良構機檢) | ⚠️ sorry 計數=定理計數,機檢通過;完整 Isabelle 証明 pending |
 
 > 投資者/審計要點:本引擎唔宣稱「全部形式化證明」,而係**每一個宣稱均標明
 > 証據層級**——呢種分級誠實正係高端市場准入貨幣(seL4/CoCo 同款文化)。
@@ -34,6 +34,7 @@
 | 工具 | 用途 | CI 實況 | 對接模組 |
 |---|---|---|---|
 | **Rocq 9.2**(rocq-core+stdlib) | 理論導出+`rocqchk` 微內核複核 | Proven(「Modules were successfully checked」) | `rocq_export`+`tool_runner` |
+| **Isabelle**(尚未裝於 CI) | sorry 顯式遺漏格式理論導出 | 結構良構機檢(T1);未經真 Isabelle 加載 | `isabelle_export`+`structural_audit` |
 | **Why3 + Z3** | Creusot Pearlite 契約 VC 消解 | Proven | `creusot_export`+`proof_resources` |
 | Maude(可選) | 重寫引擎差分對照 | 差分通道 | `maude_engine` |
 | Ari | Ari 輸出交換 | 導出器 | `ari_export` |

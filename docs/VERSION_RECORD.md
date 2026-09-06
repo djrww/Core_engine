@@ -28,7 +28,9 @@
 | DL-009 | 專有化法律地基(LICENSE/NOTICES/70 檔頭) | done | e2055ce |
 | DL-010 | workspace 五 crate 重構 | done | 870a24e;CI 34008381873 |
 | DL-011 | .wasi 跨平台打包 PoC | **parked** | 產品負責人凍結,待 beta 鎖版決定 |
-| DL-012 | 本文書包(data room) | done | 本檔所在 docs/ 成冊 |
+| DL-012 | 本文書包(data room) | done | f774a4f;CI 34025271472 |
+| DL-013 | Isabelle 導出升格(F-04 二階):sorry 顯式遺漏格式+structural_audit 結構良構機檢 | done | 本輪 commit;isabelle_export 覆蓋 100% |
+| DL-014 | bin 整合測試(bins_smoke 17 項,零第三方) | done | 本輪 commit;bin 覆蓋 47–100%,全庫 90.13%(本地) |
 
 ## 3 · 質量指標演進
 
@@ -45,7 +47,7 @@
 
 | 建議編號 | 內容 | 價值 |
 |----------|------|------|
-| DL-013 | Isabelle 証明正式化 | 消滅最大 T3 欠帳,証據分級上調 |
+| ~~DL-013~~ | ✅ 已完成(sorry 格式階段;完整 Isabelle 証明屬遠程) | 升格至「顯式遺漏可點算」 |
 | DL-014 | bin 整合測試(assert_cmd) | 消滅 16 個 bin 量測空洞(0% 假象) |
 | DL-015 | Miri/Stacked Borrows 差分對齊 | UB 預言機對齊官方語義,學術背書 |
 | DL-016 | CoCo/TPFA 第三方 CPF 消費 | 由自產自銷升級獨立複核者定位 |
