@@ -1,6 +1,6 @@
 # WORKSPACE_PLAN — 5-crate 拆分計畫(DL-010)
 
-> 狀態:**計畫定案待產品負責人確認**(2026-09-06 起草)。
+> 狀態:**已獲產品負責人批准並執行完畢**(2026-09-06;C1..C5 全數遷移,workspace 200 測試綠)。
 > 原則:①依賴方向由編譯器強制,拒絕環;②對外 API(`cl0r0::` 路徑)零變化;
 > ③測試隨模組走;④CI/覆蓋率口徑明確;⑤每步可回退(獨立 commit)。
 
@@ -11,8 +11,8 @@ core_engine/                    (Cargo workspace)
 ├── crates/
 │   ├── cl0r0-syntax/   C1 語法層   9 模組
 │   ├── cl0r0-mir/      C2 MIR 層   3 模組
-│   ├── cl0r0-ars/      C3 重寫合流層 23 模組
-│   └── cl0r0-cert/     C4 證書導出層 5 模組
+│   ├── cl0r0-ars/      C3 重寫合流層 22 模組
+│   └── cl0r0-cert/     C4 證書導出層 6 模組
 ├── src/                C5 facade crate `cl0r0`(lib + 17 bins,名不變)
 ├── Cargo.toml          [workspace]
 └── .github/workflows/ci.yml
@@ -30,7 +30,7 @@ span, lex, edit, gen, ast, parse, tree, token_tree, diff_tree
 mir, modular_contracts, variance_dropck_ub
 — mir→span(C1)✓;modular_contracts→mir;variance_dropck_ub→mir。
 
-### C3 `cl0r0-ars` 重寫/合流核心(23)
+### C3 `cl0r0-ars` 重寫/合流核心(22)
 cpf_cert(零依賴類型層), dag_term, unification, discrimination_tree, tactics,
 maude_engine, rep, rep_dd, dd_checker, rule_labeling, tactic_scheduler,
 l9newman, span_monad, shrink, reparse_verifier, r0, r0_lower, borrow_model,
@@ -38,14 +38,13 @@ patch_engine, polonius_bridge, macro_lab, testkit
 — 對下:rep→ast(C1);polonius_bridge→ast/parse/patch_engine(同層);
   reparse_verifier→edit/parse(C1);borrow_model→ast/gen/rep_dd/macro_lab/testkit(同層)✓
 
-### C4 `cl0r0-cert`(5)
-tool_runner, rocq_export, creusot_export, isabelle_export, proof_resources
+### C4 `cl0r0-cert`(6)
+tool_runner, rocq_export, creusot_export, isabelle_export, proof_resources, ari_export
 — rocq_export→cpf_cert(C3)+tool_runner(同層);proof_resources→mir(C2)✓
 
-### C5 `cl0r0` facade(11 lib 模組 + 17 bins)
+### C5 `cl0r0` facade(10 lib 模組 + 17 bins)
 lemmas, selfcheck, json_report, rustc_json, lsp_bridge, fuzz_engine,
-differential_checker, lemma_stress_generator, cert_generator_factory,
-pipeline_synthesis + lib.rs(re-export 全部,保持 `cl0r0::X` 路徑不變)+ 17 bins
+differential_checker, lemma_stress_generator, cert_generator_factory, pipeline_synthesis + lib.rs(re-export 全部,保持 `cl0r0::X` 路徑不變)+ 17 bins
 — 對下全為向下引用;rustc_json↔json_report 同層;無環 ✓
 
 ## 3 · 已知粘連點與對策

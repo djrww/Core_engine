@@ -43,22 +43,19 @@ pub use cl0r0_ars::{
     maude_engine, patch_engine, polonius_bridge, r0, r0_lower, rep, rep_dd, reparse_verifier,
     rule_labeling, shrink, span_monad, tactic_scheduler, tactics, testkit, unification,
 };
+pub use cl0r0_cert::{
+    ari_export, creusot_export, isabelle_export, proof_resources, rocq_export, tool_runner,
+};
 pub use cl0r0_mir::{mir, modular_contracts, variance_dropck_ub};
 pub use cl0r0_syntax::{ast, diff_tree, edit, gen, lex, parse, span, token_tree, tree};
 
-pub mod ari_export;
 pub mod cert_generator_factory;
-pub mod creusot_export;
 pub mod differential_checker;
 pub mod fuzz_engine;
-pub mod isabelle_export;
 pub mod json_report;
 pub mod lemma_stress_generator;
 pub mod lemmas;
 pub mod lsp_bridge;
 pub mod pipeline_synthesis;
-pub mod proof_resources;
-pub mod rocq_export;
 pub mod rustc_json;
 pub mod selfcheck;
-pub mod tool_runner;

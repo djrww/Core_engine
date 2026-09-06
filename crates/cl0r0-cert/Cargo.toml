@@ -1,0 +1,14 @@
+[package]
+name = "cl0r0-cert"
+version = "0.2.0"
+edition = "2021"
+description = "CL0/R0 certificate layer: CPF certificates, Rocq/Isabelle/Ari/Creusot export, external prover runner"
+license-file = "LICENSE"
+
+[lib]
+name = "cl0r0_cert"
+path = "src/lib.rs"
+
+[dependencies]
+cl0r0-ars = { path = "../cl0r0-ars" }
+cl0r0-mir = { path = "../cl0r0-mir" }

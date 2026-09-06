@@ -7,6 +7,7 @@ name = "cl0r0"
 version = "0.2.0"
 dependencies = [
  "cl0r0-ars",
+ "cl0r0-cert",
  "cl0r0-mir",
  "cl0r0-syntax",
 ]
@@ -16,6 +17,14 @@ name = "cl0r0-ars"
 version = "0.2.0"
 dependencies = [
  "cl0r0-syntax",
+]
+
+[[package]]
+name = "cl0r0-cert"
+version = "0.2.0"
+dependencies = [
+ "cl0r0-ars",
+ "cl0r0-mir",
 ]
 
 [[package]]
