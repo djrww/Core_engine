@@ -32,7 +32,8 @@
 | DL-013 | Isabelle 導出升格(F-04 二階):sorry 顯式遺漏格式+structural_audit 結構良構機檢 | done | 29bdfcd;CI 34027780280;isabelle_export 覆蓋 100% |
 | DL-014 | bin 整合測試(bins_smoke 17 項,零第三方) | done | 29bdfcd;CI 34027780280;bin 覆蓋 47–100%,全庫 90.87%(CI) |
 | DL-015 | Miri/Stacked Borrows 差分對齊(情景表+分歧登記) | done | 本輪 commit;SB_SCENARIOS 5 情景機檢+SB_DIVERGENCES 4 項登記;ADR-015 |
-| DL-016 | 第三方 CPF 消費入口(cpf_import+bin cpf_check) | done | 本輪 commit;四態判定;獨立複核者定位第一步 |
+| DL-016 | 第三方 CPF 消費入口(cpf_import+bin cpf_check) | done | 6bf52f8;CI 34030229681;四態判定;獨立複核者定位第一步 |
+| DL-017 | multi-edit 增量重析等價(批次/逐編輯/全量三方等價) | done | 本輪 commit;+6 測試含 30 輪隨機屬性 |
 
 ## 3 · 質量指標演進
 

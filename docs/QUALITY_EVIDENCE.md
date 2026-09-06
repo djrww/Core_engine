@@ -7,7 +7,7 @@
 
 | 門禁 | 結果 | 複核命令 |
 |------|------|----------|
-| 單元/整合測試 | **227/227 通過**(含 bins_smoke 18 項 bin 整合測試) | `cargo test --workspace --all-targets` |
+| 單元/整合測試 | **233/233 通過**(含 bins_smoke 18 項 bin 整合測試) | `cargo test --workspace --all-targets` |
 | 行覆蓋率 | **90.87%**(CI run 34027780280 lcov;門檻 72) | CI `cargo llvm-cov --workspace --fail-under-lines 72` |
 | clippy | **0 warning** | `cargo clippy --workspace --all-targets -- -D warnings` |
 | rustfmt | 通過 | `cargo fmt --all -- --check` |

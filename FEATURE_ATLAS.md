@@ -4,7 +4,7 @@
 > **架構**: DL-010 起 workspace 五 crate:C1 cl0r0-syntax(9 模組)/C2 cl0r0-mir(3)/C3 cl0r0-ars(22)/C4 cl0r0-cert(6)/C5 cl0r0 facade(10 lib 模組+17 bins);依賴方向 C5→C4→C3→C2→C1 由編譯器強制;對外 API `cl0r0::X` 路徑不變。
 > **範圍**: 51 個 lib 模組 + 18 個 bin = **68 項功能**(另有 10 個真巨集內嵌於 `macro_lab`)。
 > **覆蓋率口徑**: CI run `33999567428`(commit `7879c67`,DL-007/008 後)之 `coverage-lcov` 產物,lcov 逐檔 DA 行加總;**全庫行覆蓋率 84.62%**(門檻 72)。bin 檔顯示 0% 為量測空洞(`cargo llvm-cov` 只統計儀器化測試執行,`cargo run` 自証執行不計入),非真的零執行——CI 每輪都實跑全部 16 個 bin。
-> **測試**: `cargo test --workspace --all-targets` = **227/227 通過**(facade lib 141 + 子 crate 82 + bins/integration 61,含 DL-015 SB 差分 +3、DL-016 cpf_import +5/bins_smoke +1;workspace 口徑)。
+> **測試**: `cargo test --workspace --all-targets` = **233/233 通過**(facade lib 141 + 子 crate 88 + bins/integration 61,含 DL-015 SB 差分 +3、DL-016 cpf_import +5/bins_smoke +1、DL-017 multi-edit +6;workspace 口徑)。
 > **認證**: 表2 登記 15 項有證書功能;CI 端到端 10 門禁(verify_all)+ 7 門禁(ci_verify)+ 14 門禁(macro_lab)。
 
 ---
@@ -64,7 +64,7 @@
 | 45 | `pipeline_synthesis.rs` | 五大組合深度合成引擎 | 五階段流水線編排 | **工程層** | 端到端組合語義 | 97.0% |
 | 46 | `cert_generator_factory.rs` | 污料宇宙+證書批量生產 | 污料生成、工廠產線、髒輸入穩健性核驗 | **測試/證書層** | 認證流水線語義 | 95.8% |
 | 47 | `testkit.rs` | 共享測試見證夾具 | fixtures 單一真相(審計 D-01) | **測試基建** | 見證共用語義 | 100% |
-| 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價 | 88.0% |
+| 48 | `reparse_verifier.rs` | 增量重析等價驗證 | 快照重用等價檢查 | **測試層** | L3/L4 等價(單編輯+DL-017 批次/邊界/相鄰/隨機三方等價) | 90.9% |
 | 49 | `selfcheck.rs` | verify_all/ci_verify 門禁決策層(可單測) | GateStatus/GateOutcome 三態、GateLedger(strict 語義/退出碼)、17 個門禁「檢查+判定」函數 | **自証決策層**(消費各層產物) | F-01 三態誠實語義的單一真相 | 88.9% |
 | 50 | `fuzz_engine.rs` | 屬性測試套件引擎(lib 化,D-2 第 2 批) | iterative_purify 淨化、residual_bad_errors、tree_axiom_checks 六檢查、normalize_plan 修剪規劃、FuzzConfig(FUZZ_* env)、run_property_suite、track_summaries 三軌、facts_summary_lines | **測試層** | 種子確定性+錯誤跨度挖掘語義 | 92.9% |
 | 51 | `cpf_import.rs` | 第三方 CPF 消費入口(獨立複核者,DL-016) | documented subset 解析(DD/KB/正交)、CpfImportVerdict 四態(Verified/Rejected/Unsupported/Malformed)、不信任來源只重放見證 | **證書層**(消費) | 見證重放語義;四態如實申報 | 86.9% |
