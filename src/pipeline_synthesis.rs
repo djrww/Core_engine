@@ -1,4 +1,4 @@
-// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// Copyright (c) 2026 Ken Yuen Ka Chun. All rights reserved.
 // PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §10.1 五大核心组合深度合成引擎 (End-to-End Five-Stage Synthesized Pipeline)。
 //!

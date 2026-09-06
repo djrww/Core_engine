@@ -1,4 +1,4 @@
-// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// Copyright (c) 2026 Ken Yuen Ka Chun. All rights reserved.
 // PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! cl0r0_lsp —— 獨立 Language Server Protocol (LSP) 二進制服務進程。
 //!

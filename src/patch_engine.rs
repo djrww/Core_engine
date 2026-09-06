@@ -1,4 +1,4 @@
-// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// Copyright (c) 2026 Ken Yuen Ka Chun. All rights reserved.
 // PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §4.8 端到端补丁合成与闭环自验引擎。
 //!

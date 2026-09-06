@@ -1,4 +1,4 @@
-// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// Copyright (c) 2026 Ken Yuen Ka Chun. All rights reserved.
 // PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §6.1 导出 CoCo 2025/2026 标准 ARI (Automated Rewriting Interface) 格式规范。
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 [COPYRIGHT HOLDER]. All rights reserved.
+// Copyright (c) 2026 Ken Yuen Ka Chun. All rights reserved.
 // PROPRIETARY & CONFIDENTIAL — unauthorized copying, modification, distribution, or reverse engineering is prohibited.
 //! §4.3 機械的 Newman 通道:
 //!   **SN ∧ WCR ⇒ CR ⇒ 唯一正規形**(Newman 引理,1942)。
