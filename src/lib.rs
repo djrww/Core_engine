@@ -37,32 +37,29 @@
 //!   * `diff_tree`             : 持久化結構共享 AST 與狀態差分增量引擎 (§9.1)
 //!   * `differential_checker`  : 跨引擎語意差分測試、黃金對賬與 DDMin 自動收斂器 (§9.2)
 
+// C1 語法層(DL-010 下沉):路徑 `cl0r0::X` 保持不變 —— 單一對外 API 原則
+pub use cl0r0_syntax::{ast, diff_tree, edit, gen, lex, parse, span, token_tree, tree};
+
 pub mod ari_export;
-pub mod ast;
 pub mod borrow_model;
 pub mod cert_generator_factory;
 pub mod cpf_cert;
 pub mod creusot_export;
 pub mod dag_term;
 pub mod dd_checker;
-pub mod diff_tree;
 pub mod differential_checker;
 pub mod discrimination_tree;
-pub mod edit;
 pub mod fuzz_engine;
-pub mod gen;
 pub mod isabelle_export;
 pub mod json_report;
 pub mod l9newman;
 pub mod lemma_stress_generator;
 pub mod lemmas;
-pub mod lex;
 pub mod lsp_bridge;
 pub mod macro_lab;
 pub mod maude_engine;
 pub mod mir;
 pub mod modular_contracts;
-pub mod parse;
 pub mod patch_engine;
 pub mod pipeline_synthesis;
 pub mod polonius_bridge;
@@ -77,13 +74,10 @@ pub mod rule_labeling;
 pub mod rustc_json;
 pub mod selfcheck;
 pub mod shrink;
-pub mod span;
 pub mod span_monad;
 pub mod tactic_scheduler;
 pub mod tactics;
 pub mod testkit;
-pub mod token_tree;
 pub mod tool_runner;
-pub mod tree;
 pub mod unification;
 pub mod variance_dropck_ub;

@@ -1,0 +1,10 @@
+[package]
+name = "cl0r0-syntax"
+version = "0.2.0"
+edition = "2021"
+description = "CL0/R0 syntax layer: lex, parse, AST, token tree, edit, diff tree (L1/L2/L3L4/L7 carriers)"
+license-file = "LICENSE"
+
+[lib]
+name = "cl0r0_syntax"
+path = "src/lib.rs"
